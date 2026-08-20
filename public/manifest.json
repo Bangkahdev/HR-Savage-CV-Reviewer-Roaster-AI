@@ -1,0 +1,17 @@
+{
+  "short_name": "HR Savage AI",
+  "name": "HR Savage CV Reviewer & Roaster AI",
+  "description": "Program Penilai CV AI berstandar HR ketat: Savage Roasting, Audit Skor Industri Tinggi, Cross-Check Jejak Digital, dan GitHub Roaster.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#09090b",
+  "theme_color": "#dc2626",
+  "display": "standalone",
+  "orientation": "portrait"
+}

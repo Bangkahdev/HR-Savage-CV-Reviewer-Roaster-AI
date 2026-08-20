@@ -1,0 +1,6 @@
+# robots.txt for HR Savage CV Reviewer & Roaster AI
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://ais-pre-7mwsv63lvjfd3xmokz2t33-14618369873.asia-east1.run.app/sitemap.xml

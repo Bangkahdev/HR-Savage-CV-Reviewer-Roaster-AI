@@ -1,0 +1,6 @@
+{
+  "name": "HR Savage CV Reviewer & Roaster AI",
+  "description": "Program penilai CV berstandar HR ketat dengan AI: roasting pedas, scoring industri tinggi, deteksi inkonsistensi jejak digital, serta GitHub Roaster khusus programmer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
