@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
@@ -87,14 +87,23 @@ app.get("/api/health", (req, res) => {
 });
 
 // =========================================================================
-// 1. FULL CV REVIEW & ROASTING ENDPOINT
+// 1. FULL CV REVIEW & ROASTING ENDPOINT (/api/review-cv)
 // =========================================================================
 app.post("/api/review-cv", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
-    const { cvText, fileData, targetRole = "General Tech / Career", mode = "savage" } = req.body;
+    const {
+      cvText = "",
+      fileData,
+      targetRole = "Software Engineer",
+      targetLevel = "mid",
+      industry = "Technology",
+      jobDescription = "",
+      strictnessMode = "savage_brutal",
+      language = "id",
+    } = req.body;
 
-    if (!cvText && !fileData) {
+    if (!cvText && !fileData?.data) {
       return res.status(400).json({
         success: false,
         error: "Harap masukkan teks CV atau unggah dokumen CV/Resume Anda.",
@@ -104,96 +113,137 @@ app.post("/api/review-cv", async (req, res) => {
     const ai = getGeminiClient();
 
     const systemInstruction = `
-Kamu adalah "Savage BANGKAH Tech Recruiter & Principal Architect" dengan pengalaman 15+ tahun mengeliminasi 99% kandidat di Google, Meta, dan Unicorn.
-Tugasmu adalah menganalisis CV kandidat ini dengan sangat tajam, teliti, realistis, dan memberikan output komprehensif dalam format JSON.
+Kamu adalah "Savage FAANG Tech Recruiter, Head of Talent Acquisition & Principal Career Architect" dengan pengalaman 15+ tahun mengeliminasi 99% pelamar kerja di Google, Meta, Amazon, dan top unicorn.
+Tugasmu adalah menganalisis CV kandidat ini secara sangat mendalam, detail, objektif, tajam, dan mengeluarkan hasil evaluasi lengkap dalam format JSON.
 
 PENTING:
-- Nada bicara (Tone): ${
-      mode === "savage"
-        ? "Savage, sarkastik, pedas tapi 100% akurat, lucu, tanpa ampun, membongkar semua buzzword, metrik palsu, dan kelemahan fatal CV."
-        : mode === "ats_only"
-        ? "Fokus total pada ATS optimization, parsing score, keyword density, formatting checks, dan metrik terukur."
-        : "Konstruktif, ramah, profesional ala Senior Career Coach kelas dunia yang ingin kandidat sukses tembus BANGKAH."
-    }
-- Jangan halusinasi. Evaluasi HANYA dari informasi yang tertera di dokumen/teks.
-- Bahasa: Bahasa Indonesia yang natural, gaul untuk istilah tech, namun tetap berwawasan industri tinggi.
+- Target Role: "${targetRole}"
+- Target Level: "${targetLevel}"
+- Industri: "${industry}"
+- Strictness Mode: "${strictnessMode}" (savage_brutal = sangat pedas, sarkas, lucu, menohok, blak-blakan; stern_hr = tegas, profesional; constructive_pro = berwawasan positif; ats_robot = analitis ATS murni).
+- Bahasa Respon: ${language === "en" ? "Bahasa Inggris" : "Bahasa Indonesia yang fasih, tajam, dengan istilah dunia industri tech/karir modern"}.
 
-Kembalikan data HANYA dalam format JSON valid yang sesuai dengan skema yang diminta.
-`;
-
-    const userPromptText = `
-Target Posisi yang Dilamar: "${targetRole}"
-Mode Review: "${mode}"
-
-Analisis CV ini dan hasilkan evaluasi mendalam dengan struktur JSON berikut:
+KEMBALIKAN HANYA JSON VALID DENGAN STRUKTUR BERIKUT:
 {
-  "score": <angka 0-100>,
-  "atsScore": <angka 0-100>,
-  "candidateName": "<nama kandidat yang terdeteksi di CV atau 'Anonymous Candidate'>",
-  "candidateLevel": "<Junior / Mid-Level / Senior / Lead / Career Switcher / Mahasiswa Abadi>",
-  "detectedRole": "<role yang paling tercermin dari isi CV>",
-  "summaryRoast": "<Paragraf ringkasan roasting pembuka yang menohok atau evaluasi tajam maksimal 3 kalimat>",
-  "verdict": "<REJECTED / NEED_TOTAL_REVAMP / INTERVIEW_WORTHY / ATS_COMPLIANT_ONLY / BANGKAH_READY>",
-  "executiveSummary": "<2-3 kalimat evaluasi objektif tentang profil kandidat ini di pasar kerja saat ini>",
-  "strengths": [
-    "<Kekuatan riil 1 yang layak dipuji>",
-    "<Kekuatan riil 2>"
-  ],
-  "fatalFlaws": [
-    {
-      "title": "<Nama kesalahan fatal, misal: Metrik Palsu Tanpa Dampak Finansial / Format Kolom Dua>",
-      "severity": "<HIGH / MEDIUM / LOW>",
-      "explanation": "<Penjelasan mengapa recruiter langsung melempar CV ini ke tempat sampah karena hal ini>",
-      "solution": "<Cara konkret memperbaikinya>"
-    }
-  ],
-  "atsBreakdown": {
-    "formatCheck": {
-      "status": "<PASS / WARNING / FAIL>",
-      "comment": "<Evaluasi struktur layout, tabel, kolom, grafik yang membingungkan ATS>"
+  "overallScore": <angka bulat 0-100>,
+  "grade": "<S / A / B / C / D / F>",
+  "verdictTag": "<Tag vonis singkat misal: REJECTED IN 6 SECONDS / BUZZWORD OVERDOSE / POTENTIAL HIKIKOMORI / INTERVIEW WORTHY>",
+  "summaryRoast": "<Paragraf pembuka roasting pedas atau ringkasan evaluasi tajam 2-3 kalimat>",
+  "scoreBreakdown": {
+    "impactAndMetrics": {
+      "score": <angka 0-20>,
+      "max": 20,
+      "feedback": "<Kritik penggunaan angka, metrik finansial, formula X-Y-Z>",
+      "status": "<critical / warning / good>"
     },
-    "keywordMatch": {
-      "status": "<PASS / WARNING / FAIL>",
-      "score": <angka 0-100>,
-      "missingKeywords": ["<keyword 1>", "<keyword 2>", "<keyword 3>"],
-      "foundKeywords": ["<keyword 1>", "<keyword 2>"]
+    "atsCompatibility": {
+      "score": <angka 0-20>,
+      "max": 20,
+      "feedback": "<Kritik parsing ATS, layout kolom, font, tabel>",
+      "status": "<critical / warning / good>"
     },
-    "quantifiableMetrics": {
-      "status": "<PASS / WARNING / FAIL>",
-      "comment": "<Apakah ada angka X-Y-Z formula Google atau cuma kata kerja hampa>"
+    "actionVerbsAndClarity": {
+      "score": <angka 0-20>,
+      "max": 20,
+      "feedback": "<Kritik kata kerja aktif vs pasif>",
+      "status": "<critical / warning / good>"
     },
-    "actionVerbs": {
-      "status": "<PASS / WARNING / FAIL>",
-      "comment": "<Kualitas kata kerja aktif (Built, Architected, Optimized vs Assisted, Responsible for)>"
+    "skillsAndKeywords": {
+      "score": <angka 0-20>,
+      "max": 20,
+      "feedback": "<Kritik relevansi tech stack / kata kunci>",
+      "status": "<critical / warning / good>"
+    },
+    "careerStoryAndRelevance": {
+      "score": <angka 0-20>,
+      "max": 20,
+      "feedback": "<Kritik alur karir dan relevansi dengan target role>",
+      "status": "<critical / warning / good>"
     }
   },
-  "lineByLineRoasts": [
+  "fatalRedFlags": [
     {
-      "originalText": "<Kutipan kalimat asli di CV yang lemah/kocak/halu>",
-      "roast": "<Komentar pedas recruiter mengapa kalimat ini gagal>",
-      "suggestedFix": "<Versi revisi standar BANGKAH dengan formula STAR & X-Y-Z>"
+      "title": "<Nama Red Flag>",
+      "explanation": "<Penjelasan mengapa ini membunuh peluang CV>",
+      "severity": "<high / medium / low>",
+      "fix": "<Solusi konkret revisi>"
     }
   ],
-  "techStackAudit": {
-    "overclaimed": ["<Skill yang dicantumkan tapi tidak ada bukti nyata di deskripsi proyek>"],
-    "good": ["<Skill yang didukung pengalaman relevan>"],
-    "obsolete": ["<Skill jadul atau tidak relevan dengan target role>"]
-  },
-  "actionPlan": [
-    "<Langkah konkret 1 untuk merevisi CV dalam 24 jam ke depan>",
-    "<Langkah konkret 2>",
-    "<Langkah konkret 3>",
-    "<Langkah konkret 4>"
+  "buzzwordAudit": [
+    {
+      "word": "<Kata klise/buzzword di CV, misal: 'Hardworking', 'Passionate', 'Fast learner'>",
+      "whyItSucks": "<Alasan mengapa recruiter muak membaca kata ini>",
+      "replacement": "<Bukti konkret yang harus ditampilkan sebagai gantinya>"
+    }
   ],
-  "interviewRedFlags": [
-    "<Hal di CV ini yang pasti akan jadi bahan cecaran maut saat sesi technical interview>"
-  ]
+  "bulletPointRewrites": [
+    {
+      "original": "<Kutipan kalimat asli di CV yang lemah>",
+      "whyWeak": "<Mengapa kalimat ini gagal menunjukkan dampak>",
+      "improvedSTAR": "<Versi perbaikan berstandar FAANG Google X-Y-Z>",
+      "impactExplained": "<Dampak bisnis yang terpancar setelah direvisi>"
+    }
+  ],
+  "atsSimulation": {
+    "parseScore": <angka 0-100>,
+    "matchedKeywords": ["<keyword yang ditemukan 1>", "<keyword 2>"],
+    "missingCriticalKeywords": ["<keyword krusial yang hilang 1>", "<keyword 2>"],
+    "formattingRisks": ["<resiko format 1>", "<resiko 2>"]
+  },
+  "sectionBySectionCritique": {
+    "headerAndSummary": {
+      "roast": "<Kritik bagian profil/summary>",
+      "recommendation": "<Saran perbaikan>",
+      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
+    },
+    "workExperience": {
+      "roast": "<Kritik bagian pengalaman kerja>",
+      "recommendation": "<Saran perbaikan>",
+      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
+    },
+    "skillsAndTools": {
+      "roast": "<Kritik daftar skills>",
+      "recommendation": "<Saran perbaikan>",
+      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
+    },
+    "educationAndCertifications": {
+      "roast": "<Kritik edukasi & sertifikasi>",
+      "recommendation": "<Saran perbaikan>",
+      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
+    },
+    "layoutAndLength": {
+      "roast": "<Kritik panjang halaman & kerapihan visual>",
+      "recommendation": "<Saran perbaikan>",
+      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
+    }
+  },
+  "stepByStepActionPlan": [
+    {
+      "step": 1,
+      "priority": "<Darurat (Segera) / Penting / Penyempurnaan>",
+      "action": "<Langkah spesifik 1>",
+      "example": "<Contoh penerapannya>"
+    },
+    {
+      "step": 2,
+      "priority": "<Darurat (Segera) / Penting / Penyempurnaan>",
+      "action": "<Langkah spesifik 2>",
+      "example": "<Contoh penerapannya>"
+    },
+    {
+      "step": 3,
+      "priority": "<Darurat (Segera) / Penting / Penyempurnaan>",
+      "action": "<Langkah spesifik 3>",
+      "example": "<Contoh penerapannya>"
+    }
+  ],
+  "sampleFullCvRewriteSnippet": "<Contoh cuplikan teks pengalaman kerja yang sudah disempurnakan>"
 }
 `;
 
     const parts: any[] = [];
 
-    if (fileData && fileData.data && fileData.mimeType) {
+    if (fileData?.data && fileData?.mimeType) {
       parts.push({
         inlineData: {
           data: fileData.data,
@@ -202,15 +252,18 @@ Analisis CV ini dan hasilkan evaluasi mendalam dengan struktur JSON berikut:
       });
     }
 
-    if (cvText) {
-      parts.push({
-        text: `=== TEKS DOKUMEN / CV KANDIDAT ===\n${cvText}\n\n=== INSTRUKSI ANALISIS ===\n${userPromptText}`,
-      });
-    } else {
-      parts.push({
-        text: `=== INSTRUKSI ANALISIS DOKUMEN CV TERLAMPIR ===\n${userPromptText}`,
-      });
+    let promptContext = `=== DETAIL PENILAIAN ===\nTarget Posisi: ${targetRole}\nLevel Karir: ${targetLevel}\nIndustri: ${industry}\n`;
+    if (jobDescription) {
+      promptContext += `\nDeskripsi Lowongan (Job Desc):\n${jobDescription}\n`;
     }
+
+    if (cvText) {
+      promptContext += `\n=== ISI TEKS CV KANDIDAT ===\n${cvText}\n`;
+    }
+
+    parts.push({
+      text: `${promptContext}\n\nLakukan analisis sekarang dan berikan output HANYA format JSON yang diminta.`,
+    });
 
     const response = await generateWithRetry(ai, {
       contents: parts,
@@ -238,68 +291,88 @@ Analisis CV ini dan hasilkan evaluasi mendalam dengan struktur JSON berikut:
 });
 
 // =========================================================================
-// 2. DIGITAL FOOTPRINT AUDIT ENDPOINT
+// 2. DIGITAL FOOTPRINT AUDIT ENDPOINT (/api/audit-digital-footprint)
 // =========================================================================
 app.post("/api/audit-digital-footprint", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
-    const { name, targetRole = "Software Engineer", linkedinUrl = "", twitterHandle = "", githubUsername = "", additionalNotes = "" } = req.body;
+    const {
+      candidateName = "Kandidat",
+      name = "",
+      targetRole = "Professional",
+      cvText = "",
+      linkedinUrlOrBio = "",
+      twitterUrlOrBio = "",
+      githubUrlOrBio = "",
+      portfolioOrBlog = "",
+      additionalNotes = "",
+      language = "id",
+    } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ success: false, error: "Nama kandidat wajib diisi." });
-    }
+    const resolvedName = candidateName || name || "Kandidat";
 
     const ai = getGeminiClient();
 
-    const prompt = `
-Kamu adalah "Lead Background Check & Social Intelligence Investigator" untuk top BANGKAH & Tech VC.
-Audit jejak digital & presence profesional untuk kandidat berikut:
+    const systemInstruction = `
+Kamu adalah "Lead Background Investigator & Digital Intelligence Specialist" untuk Executive Recruiter dan FAANG.
+Tugasmu adalah melakukan cross-check antara klaim di CV dengan jejak digital (LinkedIn, X/Twitter, GitHub, Portfolio) untuk mendeteksi kontradiksi, kepalsuan, atau red flag online.
 
-Nama: ${name}
-Target Posisi: ${targetRole}
-LinkedIn URL/Username: ${linkedinUrl || "Tidak dicantumkan"}
-Twitter/X: ${twitterHandle || "Tidak dicantumkan"}
-GitHub: ${githubUsername || "Tidak dicantumkan"}
-Catatan / Postingan yang Pernah Dibuat: ${additionalNotes || "Kandidat aktif di komunitas tech, LinkedIn, dan open source"}
-
-Lakukan evaluasi digital footprint mendalam dan berikan respon JSON:
+Format respon HARUS berupa JSON murni dengan skema:
 {
-  "riskScore": <angka 0-100, di mana 0 = Sangat Aman/Bersih, 100 = Bahaya Tinggi Red Flag>,
-  "riskLevel": "<LOW / MODERATE / HIGH / CRITICAL>",
-  "summary": "<2-3 kalimat tajam menyimpulkan citra online kandidat ini di mata HR & Hiring Manager>",
-  "linkedinAudit": {
-    "headlineCheck": "<Evaluasi headline LinkedIn: Apakah generic ('Aspiring SE', 'Looking for Opportunity') atau authoritative>",
-    "aboutSectionRating": "<POOR / AVERAGE / STELLAR>",
-    "recommendation": "<Saran konkret meningkatkan daya pikat profil LinkedIn>"
+  "authenticityScore": <angka 0-100, 100 = Sangat Otentik/Kredibel, 0 = Penuh Kebohongan/Red Flag>,
+  "riskLevel": "<low / medium / high / critical>",
+  "verdict": "<Tag vonis tajam, misal: MASSIVE DISCREPANCY DETECTED / CLEAN & VERIFIED / RED FLAG MAGNET>",
+  "summaryRoast": "<Roasting pedas 2-3 kalimat mengenai reputasi dan kontradiksi jejak digital kandidat>",
+  "digitalPersonaAudit": {
+    "professionalismRating": "<Komentar rating profesionalitas profil online>",
+    "toneRoast": "<Kritik gaya komunikasi / tweet / postingan kandidat di medsos>",
+    "onlineActivityRisk": "<Risiko reputasi jika perusahaan merekrut kandidat ini>"
   },
-  "socialMediaHygiene": {
-    "dramaRisk": "<LOW / MEDIUM / HIGH>",
-    "rantDetected": "<Analisis potensi postingan emosional / mengeluh soal kantor lama / drama di medsos>",
-    "professionalAlignment": "<Sejauh mana persona publiknya mendukung klaim kompetensi teknisnya>"
-  },
-  "publicBrandingStrengths": [
-    "<Poin positif branding digital 1>",
-    "<Poin positif 2>"
-  ],
-  "redFlagsDetected": [
+  "inconsistencies": [
     {
-      "issue": "<Isu red flag, misal: 'Open to Work' banner berbulan-bulan tanpa portofolio aktif / Tidak ada bukti coding di publik>",
-      "severity": "<HIGH / MEDIUM / LOW>",
-      "impact": "<Bagaimana hal ini menurunkan tawar-menawar gaji kandidat>",
-      "fix": "<Langkah pembersihan atau mitigasi>"
+      "claimInCv": "<Klaim di CV, misal: 'Senior Tech Lead 5 tahun'>",
+      "foundInDigitalFootprint": "<Fakta di jejak digital, misal: 'Di LinkedIn terdaftar masih Freshgrad / Bio Twitter mengeluh baru belajar coding'>",
+      "severity": "<critical / warning / minor>",
+      "analysis": "<Mengapa kontradiksi ini fatal di mata HR>"
     }
   ],
-  "actionableImprovements": [
-    "<Langkah 1 optimasi jejak digital dalam 48 jam>",
-    "<Langkah 2>",
-    "<Langkah 3>"
+  "verifiedHighlights": [
+    {
+      "skillOrExperience": "<Skill atau pencapaian yang terverifikasi nyata>",
+      "evidence": "<Bukti di medsos / repo / portofolio>",
+      "credibilityNote": "<Catatan kredibilitas>"
+    }
+  ],
+  "backgroundCheckAdvice": [
+    {
+      "action": "<Langkah pembersihan atau sinkronisasi profil online>",
+      "whyItMatters": "<Alasan pentingnya bagi karir>"
+    }
   ]
 }
 `;
 
+    const userPrompt = `
+AUDIT JEJAK DIGITAL UNTUK:
+Nama Kandidat: ${resolvedName}
+Target Posisi: ${targetRole}
+Teks/Klaim CV: ${cvText || "Tidak dicantumkan"}
+
+Data Jejak Digital:
+- LinkedIn / Bio: ${linkedinUrlOrBio || "Tidak dicantumkan"}
+- Twitter/X / Tweet: ${twitterUrlOrBio || "Tidak dicantumkan"}
+- GitHub / Repos: ${githubUrlOrBio || "Tidak dicantumkan"}
+- Portfolio / Blog: ${portfolioOrBlog || "Tidak dicantumkan"}
+- Catatan Tambahan: ${additionalNotes || "Tidak ada catatan tambahan"}
+
+Bahasa: ${language === "en" ? "English" : "Bahasa Indonesia"}
+Keluarkan HANYA JSON valid.
+`;
+
     const response = await generateWithRetry(ai, {
-      contents: prompt,
+      contents: userPrompt,
       config: {
+        systemInstruction,
         responseMimeType: "application/json",
       },
     });
@@ -314,66 +387,93 @@ Lakukan evaluasi digital footprint mendalam dan berikan respon JSON:
 });
 
 // =========================================================================
-// 3. GITHUB ROASTER & CODE PORTFOLIO AUDITOR
+// 3. GITHUB ROASTER & CODE PORTFOLIO AUDITOR (/api/roast-github)
 // =========================================================================
 app.post("/api/roast-github", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
-    const { username, repoList = "", claimedTech = "", targetRole = "Software Engineer" } = req.body;
+    const {
+      username = "developer",
+      targetRole = "Software Engineer",
+      claimedTechStack = "",
+      manualRepoInfo = "",
+      language = "id",
+    } = req.body;
 
-    if (!username) {
-      return res.status(400).json({ success: false, error: "Username GitHub wajib diisi." });
+    if (!username && !manualRepoInfo) {
+      return res.status(400).json({ success: false, error: "Silakan masukkan username GitHub atau daftar repositori." });
     }
 
     const ai = getGeminiClient();
 
-    const prompt = `
-Kamu adalah "Staff Infrastructure Engineer & Tech Lead" yang sudah me-review ribuan profil GitHub.
-Bongkar dan roast profil GitHub milik @${username} untuk posisi "${targetRole}".
+    const systemInstruction = `
+Kamu adalah "Savage Staff Infrastructure Engineer & Principal Code Reviewer" yang sudah mengaudit jutaan repo GitHub.
+Roast profil GitHub ini secara brutal, lucu, cerdas, dan teliti, lalu keluarkan data JSON dengan skema:
 
-Data Tambahan:
-- Tech Stack yang diklaim kandidat di CV: "${claimedTech || "React, Node.js, TypeScript, Docker"}"
-- Daftar Repositori / Deskripsi yang diberikan: "${repoList || "Mencakup repositori tutorial, skripsi/tugas akhir, CRUD, dan personal website"}"
-
-Kembalikan analisis JSON komprehensif:
 {
-  "devTier": "<TUTORIAL_HELL_SURVIVOR / GREEN_SQUARE_FARMER / JUNIOR_CRUD_SPECIALIST / SOLID_MID_LEVEL / PRODUCTION_HARDENED_CHAD>",
-  "overallRoast": "<Roasting pedas 3 kalimat mengenai reputasi profil kodingnya>",
-  "statsSummary": {
-    "commitQualityScore": <angka 0-100>,
-    "architectureScore": <angka 0-100>,
-    "originalityScore": <angka 0-100>,
-    "productionReadiness": <angka 0-100>
+  "username": "${username}",
+  "devScore": <angka 0-100>,
+  "devTier": "<Tutorial Hell Survivor / Green Square Farmer / Junior CRUD Specialist / Solid Mid-Level / Production Hardened Chad>",
+  "verdictTag": "<Tag vonis singkat misal: TUTORIAL COPY-PASTER / CERTIFIED BUG ARCHITECT / 10X DEVELOPER>",
+  "brutalRoast": "<Paragraf roasting pedas dan menohok mengenai profil kodingnya>",
+  "metricsAudit": {
+    "repoCount": <perkiraan jumlah repo atau 12>,
+    "starsTotal": <perkiraan total stars>,
+    "topLanguages": ["<bahasa 1>", "<bahasa 2>", "<bahasa 3>"],
+    "commitConsistencyScore": <angka 0-100>,
+    "readmeQualityScore": <angka 0-100>
   },
-  "roastPoints": [
+  "roastCategories": {
+    "tutorialHellDiagnosis": {
+      "status": "<safe / warning / severe>",
+      "explanation": "<Penjelasan apakah repo penuh clone netflix/todo-app tutorial youtube>"
+    },
+    "codeSmellAndQuality": {
+      "status": "<safe / warning / severe>",
+      "explanation": "<Kritik arsitektur kode, hardcoded secret, tidak ada unit test>"
+    },
+    "commitHabitsAndMessages": {
+      "status": "<safe / warning / severe>",
+      "explanation": "<Kritik gaya commit message seperti 'update', 'fix bug', 'asdfgh'>"
+    },
+    "techStackVsCvAlignment": {
+      "status": "<aligned / questionable / fake>",
+      "explanation": "<Apakah tech stack yang diklaim di CV terbukti di repo kodingnya>"
+    }
+  },
+  "repoTeardowns": [
     {
-      "category": "<Tutorial Hell / Commit History / Documentation / Architecture>",
-      "roast": "<Kritik pedas misal: 'Repo clone Netflix ke-8000 tanpa auth asli dan API key terekspos di repo publik'>",
-      "verdict": "<CRINGE / ACCEPTABLE / IMPRESSIVE>"
+      "repoName": "<Nama Repo>",
+      "techStack": ["<Tech 1>", "<Tech 2>"],
+      "roast": "<Kritik roasting spesifik untuk repo ini>",
+      "verdict": "<CRINGE / BUTUH KERJA KERAS / LUMAYAN / IMPRESIF>",
+      "howToFix": "<Saran arsitektur untuk membuatnya jadi portofolio level FAANG>"
     }
   ],
-  "techStackDiscrepancy": {
-    "claimed": ["${claimedTech || "Docker, Kubernetes, Microservices"}"],
-    "actualEvident": ["<Hanya basic HTML, CSS, JavaScript, dan Todo App>"],
-    "verdict": "<Analisis apakah kandidat 'overclaiming' atau jujur>"
-  },
-  "topRepoRecommendations": [
+  "portfolioUpgradeBlueprint": [
     {
-      "suggestedProject": "<Ide project nyata berstandar industri yang harus dia buat untuk membuktikan kemampuannya>",
-      "whyItWins": "<Mengapa project ini akan membuat Tech Lead terpukau>"
+      "projectName": "<Ide project nyata yang harus dibangun>",
+      "architectureSuggested": "<Arsitektur dan stack yang direkomendasikan>",
+      "whyRecruitersLoveIt": "<Mengapa project ini akan membuat Tech Lead kagum>"
     }
-  ],
-  "commitMessageRoast": "<Roasting gaya penulisan commit message seperti 'fix bug', 'update', 'test 123', 'asdfgh'>",
-  "readmeActionChecklist": [
-    "<Perbaikan 1 untuk README.md>",
-    "<Perbaikan 2>"
   ]
 }
 `;
 
+    const userPrompt = `
+Username GitHub: ${username}
+Target Role: ${targetRole}
+Klaim Tech Stack di CV: ${claimedTechStack || "React, Node.js, TypeScript, Docker"}
+Daftar Repo & Aktivitas: ${manualRepoInfo || "Repo tutorial dasar dan CRUD"}
+
+Bahasa: ${language === "en" ? "English" : "Bahasa Indonesia"}
+Keluarkan HANYA JSON valid.
+`;
+
     const response = await generateWithRetry(ai, {
-      contents: prompt,
+      contents: userPrompt,
       config: {
+        systemInstruction,
         responseMimeType: "application/json",
       },
     });
@@ -388,65 +488,33 @@ Kembalikan analisis JSON komprehensif:
 });
 
 // =========================================================================
-// 4. INTERACTIVE RECRUITER CHATBOT & FIX GENERATOR
+// 4. INTERACTIVE HR CHATBOT (/api/chat-hr)
 // =========================================================================
-app.post("/api/generate-fix", async (req, res) => {
+app.post("/api/chat-hr", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
-    const { sectionName, currentContent, targetRole, instructions } = req.body;
-    const ai = getGeminiClient();
-
-    const prompt = `
-Kamu adalah Executive CV Writer untuk Tech Leaders.
-Tulis ulang bagian "${sectionName}" dari CV berikut agar berstandar BANGKAH/Tier-1 Tech Company.
-
-Target Role: ${targetRole || "Software Engineer"}
-Konten Saat Ini:
-"${currentContent}"
-
-Instruksi Khusus: ${instructions || "Gunakan action verbs kuat, formula Google X-Y-Z, dan metrik bisnis terukur."}
-
-Keluarkan HANYA teks markdown hasil revisi yang langsung siap disalin ke dokumen CV.
-`;
-
-    const response = await generateWithRetry(ai, {
-      contents: prompt,
-    });
-
-    res.json({
-      success: true,
-      revisedContent: response.text || "",
-    });
-  } catch (error: any) {
-    console.error("Generate fix error:", error);
-    res.status(500).json({ success: false, error: formatErrorMessage(error) });
-  }
-});
-
-app.post("/api/chat-recruiter", async (req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  try {
-    const { message, chatHistory = [], cvContext = "" } = req.body;
+    const { messages = [], cvContext, targetRole = "Software Engineer" } = req.body;
     const ai = getGeminiClient();
 
     const systemPrompt = `
-Kamu adalah "Savage HR & Career Architect". Jawab pertanyaan user mengenai persiapan karir, negosiasi gaji, trik interview, atau revisi CV mereka.
-Jawab dengan gaya blak-blakan, penuh wawasan orang dalam (insider HR tricks), taktis, dan solutif.
+Kamu adalah "Savage Head of Talent Acquisition & Executive Career Coach". 
+Gaya bicaramu: tajam, to-the-point, berwawasan insider HR tingkat tinggi, lucu, sarkas bila kandidat memberikan jawaban lemah, namun sangat solutif dalam membantu kandidat memperbaiki CV dan lolos wawancara kerja.
 
-Konteks CV Kandidat saat ini:
-${cvContext ? cvContext.substring(0, 3000) : "Belum ada CV yang diunggah"}
+Target Posisi: ${targetRole}
+Konteks Evaluasi CV: ${cvContext ? JSON.stringify(cvContext) : "Belum ada CV yang di-upload"}
 `;
 
-    const contents = [
-      ...chatHistory.map((msg: any) => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }],
-      })),
-      {
+    const contents = messages.map((msg: any) => ({
+      role: msg.sender === "user" ? "user" : "model",
+      parts: [{ text: msg.text || msg.content || "" }],
+    }));
+
+    if (contents.length === 0) {
+      contents.push({
         role: "user",
-        parts: [{ text: message }],
-      },
-    ];
+        parts: [{ text: "Halo HR, tolong bantu saya evaluasi karir." }],
+      });
+    }
 
     const response = await generateWithRetry(ai, {
       contents,
@@ -457,7 +525,9 @@ ${cvContext ? cvContext.substring(0, 3000) : "Belum ada CV yang diunggah"}
 
     res.json({
       success: true,
-      reply: response.text || "Tidak ada respon.",
+      data: {
+        reply: response.text || "Maaf, rekruter sedang sibuk mengeliminasi CV lain. Coba tanyakan lagi.",
+      },
     });
   } catch (error: any) {
     console.error("Chat error:", error);
@@ -466,7 +536,7 @@ ${cvContext ? cvContext.substring(0, 3000) : "Belum ada CV yang diunggah"}
 });
 
 // =========================================================================
-// 5. BULLET POINT REWRITER
+// 5. BULLET POINT REWRITER (/api/rewrite-bullet)
 // =========================================================================
 app.post("/api/rewrite-bullet", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
@@ -479,15 +549,15 @@ app.post("/api/rewrite-bullet", async (req, res) => {
     const ai = getGeminiClient();
 
     const prompt = `
-Ubah bullet point CV berikut menjadi 3 variasi standar emas BANGKAH/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
+Ubah kalimat pengalaman kerja CV ini menjadi 3 variasi standar emas FAANG/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
 
-Bullet Point Asli: "${bulletText}"
+Kalimat Asli: "${bulletText}"
 Target Role: ${role}
 ${metricHint ? `Petunjuk Angka/Metrik Tambahan: ${metricHint}` : ""}
 
-Berikan respons dalam JSON:
+KEMBALIKAN HANYA JSON DENGAN STRUKTUR BERIKUT:
 {
-  "analysis": "Mengapa kalimat asli lemah / pasif",
+  "analysis": "Penjelasan mengapa kalimat asli lemah / pasif",
   "variations": [
     {
       "type": "High Impact / Revenue / Scale",
@@ -517,7 +587,7 @@ Berikan respons dalam JSON:
 
     const cleanedText = cleanJsonString(response.text || "{}");
     const parsed = JSON.parse(cleanedText);
-    res.json({ success: true, ...parsed });
+    res.json({ success: true, data: parsed });
   } catch (error: any) {
     console.error("Rewrite error:", error);
     res.status(500).json({ success: false, error: formatErrorMessage(error) });
