@@ -1,28 +1,29 @@
-name: CD - Production Deployment
+name: CI - Lint, Test & Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
   workflow_dispatch:
 
-concurrency:
-  group: production-deploy
-  cancel-in-progress: true
-
 jobs:
-  deploy:
-    name: Build & Deploy Application
+  validate:
+    name: Code Quality & Build Verification
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies
         run: |
@@ -32,19 +33,15 @@ jobs:
             npm install
           fi
 
-      - name: Run Build
+      - name: Type Check & Linting
+        run: npm run lint
+
+      - name: Production Build Check
         run: npm run build
-        env:
-          NODE_ENV: production
 
-      - name: Verify Build Artifacts
+      - name: Verify Distribution Output
         run: |
-          echo "Checking built assets..."
-          ls -la dist/
-          echo "Server bundle size:"
-          du -sh dist/server.cjs
-
-      - name: Ready for Container / Server Deployment
-        run: |
-          echo "🚀 Deployment package successfully generated in dist/"
-          echo "✅ Ready for production execution via: node dist/server.cjs"
+          test -d dist || { echo "❌ dist folder not found!"; exit 1; }
+          test -f dist/index.html || { echo "❌ dist/index.html not found!"; exit 1; }
+          test -f dist/server.cjs || { echo "❌ dist/server.cjs not found!"; exit 1; }
+          echo "✅ Production artifacts verified successfully!"
