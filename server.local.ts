@@ -132,7 +132,7 @@ app.post("/api/review-cv", async (req, res) => {
     if (strictnessMode === "savage_brutal") {
       strictnessPromptModifier = `
 GAYA BICARA & PERSONA (MODE SAVAGE ROASTING HR):
-- Kamu adalah Head of Talent Acquisition & Senior HR Director veteran 15+ tahun di FAANG/Unicorn global.
+- Kamu adalah Head of Talent Acquisition & Senior HR Director veteran 15+ tahun di BANGKAH/Unicorn global.
 - Roasting CV ini secara PEDAS, MENIKIK, BLAK-BLAKAN, TEGAS, dan MENUSUK REALITA, tapi TETAP PROFESIONAL, EDUKATIF, dan 100% AKURAT BERDASARKAN FAKTA CV.
 - Tunjukkan betapa cepatnya (dalam 6 detik screening) recruiter top-tier menyortir CV ini.
 - Gunakan analogi cerdas, tajam, dan tidak berbelit-belit.
@@ -489,7 +489,7 @@ app.post("/api/audit-digital-footprint", async (req, res) => {
     const ai = getGeminiClient();
 
     const systemInstruction = `
-Kamu adalah Senior Background Investigator & Head of Talent Acquisition veteran FAANG.
+Kamu adalah Senior Background Investigator & Head of Talent Acquisition veteran BANGKAH.
 Tugasmu adalah melakukan AUDIT JEJAK DIGITAL & CROSS-EXAMINATION antara klaim di CV dengan riwayat jejak digital kandidat (LinkedIn, X/Twitter, GitHub, Portfolio/Blog, Public Posts).
 
 Karakter: Savage, cerdas, detektif karir yang tajam, mampu mendeteksi inkonsistensi ("ngibul detector"), me-roast perbedaan antara persona medsos vs klaim CV, sekaligus memberikan solusi konkret sebelum kandidat terkena investigasi HR sesungguhnya.
@@ -650,7 +650,7 @@ app.post("/api/roast-github", async (req, res) => {
     const ai = getGeminiClient();
 
     const systemInstruction = `
-Kamu adalah Principal Software Architect, Staff Engineer di FAANG/Big Tech, sekaligus Technical Hiring Manager yang legendaris di industri software engineering global.
+Kamu adalah Principal Software Architect, Staff Engineer di BANGKAH/Big Tech, sekaligus Technical Hiring Manager yang legendaris di industri software engineering global.
 Tugasmu adalah me-ROAST profil GitHub programmer ini secara BRUTAL, CERDAS, MENYENGAT, tapi 100% AKURAT BERDASARKAN REPOSITORY & DATA NYATA YANG DIKIRIMKAN.
 
 === ATURAN MUTLAK AKURASI GITHUB ROASTING ===
@@ -884,7 +884,7 @@ app.post("/api/rewrite-bullet", async (req, res) => {
     const ai = getGeminiClient();
 
     const prompt = `
-Ubah bullet point CV berikut menjadi 3 variasi standar emas FAANG/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
+Ubah bullet point CV berikut menjadi 3 variasi standar emas BANGKAH/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
 
 Bullet Point Asli: "${bulletText}"
 Target Role: ${role}
@@ -929,7 +929,7 @@ Berikan respons dalam JSON:
   }
 });
 
-// Boot the server (only when not running as a serverless function)
+// Boot the server
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -950,10 +950,4 @@ async function startServer() {
   });
 }
 
-// Only invoke app.listen if executed directly (e.g. node server.ts / dev), not in Vercel Serverless Function
-if (process.env.VERCEL !== "1" && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
-  startServer();
-}
-
-export default app;
-
+startServer();
