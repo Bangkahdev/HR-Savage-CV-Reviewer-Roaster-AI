@@ -17,16 +17,20 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node.js 20.x
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci --prefer-offline
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci || npm install
+          else
+            npm install
+          fi
 
       - name: Run Build
         run: npm run build
@@ -40,7 +44,6 @@ jobs:
           echo "Server bundle size:"
           du -sh dist/server.cjs
 
-      # Deployment Step (Google Cloud Run / Container / Docker / Self-Hosted)
       - name: Ready for Container / Server Deployment
         run: |
           echo "🚀 Deployment package successfully generated in dist/"
