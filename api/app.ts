@@ -104,7 +104,7 @@ app.post("/api/review-cv", async (req, res) => {
     const ai = getGeminiClient();
 
     const systemInstruction = `
-Kamu adalah "Savage FAANG Tech Recruiter & Principal Architect" dengan pengalaman 15+ tahun mengeliminasi 99% kandidat di Google, Meta, dan Unicorn.
+Kamu adalah "Savage BANGKAH Tech Recruiter & Principal Architect" dengan pengalaman 15+ tahun mengeliminasi 99% kandidat di Google, Meta, dan Unicorn.
 Tugasmu adalah menganalisis CV kandidat ini dengan sangat tajam, teliti, realistis, dan memberikan output komprehensif dalam format JSON.
 
 PENTING:
@@ -113,7 +113,7 @@ PENTING:
         ? "Savage, sarkastik, pedas tapi 100% akurat, lucu, tanpa ampun, membongkar semua buzzword, metrik palsu, dan kelemahan fatal CV."
         : mode === "ats_only"
         ? "Fokus total pada ATS optimization, parsing score, keyword density, formatting checks, dan metrik terukur."
-        : "Konstruktif, ramah, profesional ala Senior Career Coach kelas dunia yang ingin kandidat sukses tembus FAANG."
+        : "Konstruktif, ramah, profesional ala Senior Career Coach kelas dunia yang ingin kandidat sukses tembus BANGKAH."
     }
 - Jangan halusinasi. Evaluasi HANYA dari informasi yang tertera di dokumen/teks.
 - Bahasa: Bahasa Indonesia yang natural, gaul untuk istilah tech, namun tetap berwawasan industri tinggi.
@@ -133,7 +133,7 @@ Analisis CV ini dan hasilkan evaluasi mendalam dengan struktur JSON berikut:
   "candidateLevel": "<Junior / Mid-Level / Senior / Lead / Career Switcher / Mahasiswa Abadi>",
   "detectedRole": "<role yang paling tercermin dari isi CV>",
   "summaryRoast": "<Paragraf ringkasan roasting pembuka yang menohok atau evaluasi tajam maksimal 3 kalimat>",
-  "verdict": "<REJECTED / NEED_TOTAL_REVAMP / INTERVIEW_WORTHY / ATS_COMPLIANT_ONLY / FAANG_READY>",
+  "verdict": "<REJECTED / NEED_TOTAL_REVAMP / INTERVIEW_WORTHY / ATS_COMPLIANT_ONLY / BANGKAH_READY>",
   "executiveSummary": "<2-3 kalimat evaluasi objektif tentang profil kandidat ini di pasar kerja saat ini>",
   "strengths": [
     "<Kekuatan riil 1 yang layak dipuji>",
@@ -171,7 +171,7 @@ Analisis CV ini dan hasilkan evaluasi mendalam dengan struktur JSON berikut:
     {
       "originalText": "<Kutipan kalimat asli di CV yang lemah/kocak/halu>",
       "roast": "<Komentar pedas recruiter mengapa kalimat ini gagal>",
-      "suggestedFix": "<Versi revisi standar FAANG dengan formula STAR & X-Y-Z>"
+      "suggestedFix": "<Versi revisi standar BANGKAH dengan formula STAR & X-Y-Z>"
     }
   ],
   "techStackAudit": {
@@ -252,7 +252,7 @@ app.post("/api/audit-digital-footprint", async (req, res) => {
     const ai = getGeminiClient();
 
     const prompt = `
-Kamu adalah "Lead Background Check & Social Intelligence Investigator" untuk top FAANG & Tech VC.
+Kamu adalah "Lead Background Check & Social Intelligence Investigator" untuk top BANGKAH & Tech VC.
 Audit jejak digital & presence profesional untuk kandidat berikut:
 
 Nama: ${name}
@@ -398,7 +398,7 @@ app.post("/api/generate-fix", async (req, res) => {
 
     const prompt = `
 Kamu adalah Executive CV Writer untuk Tech Leaders.
-Tulis ulang bagian "${sectionName}" dari CV berikut agar berstandar FAANG/Tier-1 Tech Company.
+Tulis ulang bagian "${sectionName}" dari CV berikut agar berstandar BANGKAH/Tier-1 Tech Company.
 
 Target Role: ${targetRole || "Software Engineer"}
 Konten Saat Ini:
@@ -479,7 +479,7 @@ app.post("/api/rewrite-bullet", async (req, res) => {
     const ai = getGeminiClient();
 
     const prompt = `
-Ubah bullet point CV berikut menjadi 3 variasi standar emas FAANG/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
+Ubah bullet point CV berikut menjadi 3 variasi standar emas BANGKAH/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
 
 Bullet Point Asli: "${bulletText}"
 Target Role: ${role}
