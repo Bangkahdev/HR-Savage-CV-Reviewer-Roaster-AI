@@ -156,7 +156,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
             Roast My CV <span className="text-red-500">Zero Mercy</span>
           </h2>
           <p className="mt-2 text-zinc-400 text-xs sm:text-sm leading-relaxed">
-            Evaluasi CV berstandar rekruter FAANG & Fortune 500. Dapatkan skor industri objektif, simulasi parser ATS, detoks buzzwords instan, dan formula Google X-Y-Z otomatis.
+            Evaluasi CV berstandar rekruter BANGKAH & Fortune 500. Dapatkan skor industri objektif, simulasi parser ATS, detoks buzzwords instan, dan formula Google X-Y-Z otomatis.
           </p>
         </div>
 
@@ -454,7 +454,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                   >
                     <div className="flex items-center justify-between w-full mb-1">
                       <span className="text-xs font-bold text-zinc-200">👔 Stern Exec</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 font-bold uppercase">FAANG</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 font-bold uppercase">BANGKAH</span>
                     </div>
                     <span className="text-[10px] text-zinc-400">Formal &amp; data-driven criteria.</span>
                   </button>

@@ -1,19 +1,14 @@
 import React, { useState } from "react";
 import {
-  Github,
   Flame,
   Code2,
   GitBranch,
   Terminal,
-  Cpu,
   AlertTriangle,
   Sparkles,
   RotateCcw,
   Check,
   Copy,
-  ExternalLink,
-  BookOpen,
-  Layers,
 } from "lucide-react";
 import { GitHubRoastRequest, GitHubRoastResult } from "../types";
 import { safeFetchJson } from "../utils/api";
@@ -40,22 +35,57 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
   const [copiedRoast, setCopiedRoast] = useState(false);
 
   const handleFillSample = (type: "junior" | "senior") => {
-    if (type === "junior") {
-      setUsername("alex-dev-starter");
-      setTargetRole("Senior Frontend Developer");
-      setClaimedTechStack("React, Next.js, Microservices, Kubernetes, TypeScript, GraphQL");
-      setManualRepoInfo(
-        "Repos:\n- todo-app-react (dibuat 2 tahun lalu, 2 commits: 'first commit', 'fix')\n- netflix-clone (copy-paste dari youtube tutorial)\n- weather-app-js (pake openweathermap gratisan)\n- portfolio-v1, portfolio-v2, portfolio-v3 (semuanya template html css bootstrap)\n- fork repo create-react-app (tidak pernah ada commit tambahan)"
-      );
-    } else {
-      setUsername("torvalds");
-      setTargetRole("Lead Kernel & Systems Architect");
-      setClaimedTechStack("C, Assembly, Git, Linux Kernel, Low-Level Architecture");
-      setManualRepoInfo("Creator of Linux and Git, legendary commits, millions of stars.");
-    }
-    setErrorMessage(null);
-  };
+  if (type === "junior") {
+    setUsername("Bangkah");
 
+    setTargetRole("maintenance / devops / backend engineer");
+
+    setClaimedTechStack(
+      "React, Next.js, TypeScript, Node.js, Docker, Kubernetes, GraphQL"
+    );
+
+    setManualRepoInfo(
+      `Repos:
+        - portfolio(personal portfolio menggunakan React dan Tailwind CSS)
+        - todo-app (CRUD application sederhana)
+        - weather-app (menggunakan public weather API)
+        - ecommerce-demo (frontend project dengan React)
+        - backend-api (REST API sederhana dengan Node.js)
+
+        GitHub activity:
+        - Beberapa project masih berupa eksperimen dan learning projects
+        - Sebagian repository memiliki dokumentasi yang belum lengkap
+        - Belum memiliki pengalaman profesional yang signifikan sebagai Senior Frontend Developer`
+    );
+  } else {
+    setUsername("Bangkah");
+
+    setTargetRole("DevOps / Backend Engineer");
+
+    setClaimedTechStack(
+      "Linux, Git, GitHub Actions, Docker, Go, Node.js, PostgreSQL, Redis, React, Next.js, gRPC, Supabase, Cloud Native"
+    );
+
+    setManualRepoInfo(
+      `Open source & personal projects:
+        - NetInfo — CLI utility untuk menampilkan informasi sistem dan jaringan Linux
+        - Sentinel AI — project yang berkaitan dengan AI dan software engineering
+        - Bangkah Launcher — personal software project
+        - Atha — software/project development repository
+        - Berbagai eksperimen backend, DevOps, CI/CD, Linux, dan cloud-native
+
+        GitHub activity:
+        - Aktif menggunakan Git dan GitHub dalam software development workflow
+        - Memiliki pengalaman membuat dan mengelola Pull Request
+        - Menggunakan GitHub Actions untuk CI/CD dan automation
+        - Aktif mengembangkan dan mendokumentasikan proyek open source
+        - Memiliki pembelajaran/credential terkait eBPF dan Cilium dari Isovalent
+        - Fokus pengembangan: backend, DevOps, Linux, cloud-native, infrastructure, dan platform engineering`
+    );
+  }
+
+  setErrorMessage(null);
+};
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -401,7 +431,7 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
             </div>
           </div>
 
-          {/* FAANG Portfolio Upgrade Blueprint */}
+          {/* BANGKAH Portfolio Upgrade Blueprint */}
           <div className="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-6 sm:p-7 shadow-2xl backdrop-blur-xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
               <h3 className="text-xs sm:text-sm font-black text-zinc-100 uppercase tracking-widest flex items-center gap-2">
@@ -459,13 +489,13 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center gap-1.5">
-                  <Github className="w-3.5 h-3.5 text-zinc-300" /> Username GitHub atau URL Profil
+                  <Code2 className="w-3.5 h-3.5 text-zinc-300" /> Username GitHub atau URL Profil
                 </label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Contoh: torvalds atau github.com/username"
+                  placeholder="Contoh: Bangkah atau github.com/Bangkah"
                   className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs focus:outline-none focus:border-red-500 font-mono shadow-inner"
                 />
               </div>

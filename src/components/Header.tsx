@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, Github, FileText, RefreshCw, Sparkles } from "lucide-react";
+import { Search, Code2, FileText, RefreshCw, Sparkles } from "lucide-react";
 import { AppMode } from "../types";
 
 interface HeaderProps {
@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
             id="tab-mode-github"
           >
-            <Github className="w-3.5 h-3.5" />
+            <Code2 className="w-3.5 h-3.5" />
             <span>GitHub Roasted</span>
           </button>
         </div>
@@ -104,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="bg-zinc-900/80 border border-zinc-700/60 px-3 py-1.5 rounded-lg flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-300 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-red-500" /> FAANG HR ACTIVE
+              <Sparkles className="w-3 h-3 text-red-500" /> BANGKAH HR ACTIVE
             </span>
           </div>
         </div>

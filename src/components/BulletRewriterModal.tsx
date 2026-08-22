@@ -161,7 +161,7 @@ export const BulletRewriterModal: React.FC<BulletRewriterModalProps> = ({
             {isLoading ? (
               <>
                 <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Merombak Kalimat dengan Formula FAANG...</span>
+                <span>Merombak Kalimat dengan Formula BANGKAH...</span>
               </>
             ) : (
               <>

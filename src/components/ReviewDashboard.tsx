@@ -18,7 +18,7 @@ import {
   Wand2,
   BarChart3,
   Search,
-  Github,
+  Code2,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { CVReviewResult } from "../types";
@@ -141,7 +141,7 @@ export const ReviewDashboard: React.FC<ReviewDashboardProps> = ({
             <span className="font-bold text-red-400 flex items-center gap-1.5 bg-red-950/40 px-2.5 py-0.5 rounded-full border border-red-900/40">
               <Flame className="w-3.5 h-3.5 text-red-500" /> {result.verdictTag}
             </span>
-            <span className="text-zinc-500 text-[11px] font-mono">Strictness: FAANG Level</span>
+            <span className="text-zinc-500 text-[11px] font-mono">Strictness: BANGKAH Level</span>
           </div>
         </div>
 
@@ -376,7 +376,7 @@ export const ReviewDashboard: React.FC<ReviewDashboardProps> = ({
                 onClick={onNavigateToGithubRoast}
                 className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md border border-zinc-800 cursor-pointer"
               >
-                <Github className="w-3.5 h-3.5 text-red-400" /> Roast GitHub
+                <Code2 className="w-3.5 h-3.5 text-red-400" />Roast GitHub
               </button>
             )}
 
@@ -891,7 +891,7 @@ export const ReviewDashboard: React.FC<ReviewDashboardProps> = ({
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
                 <Award className="w-4 h-4 text-teal-400" />
-                Contoh Draf CV yang Telah Dipoles Standar FAANG
+                Contoh Draf CV yang Telah Dipoles Standar BANGKAH
               </h4>
               <button
                 onClick={handleCopyMarkdown}

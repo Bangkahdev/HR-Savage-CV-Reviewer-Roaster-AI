@@ -11,128 +11,280 @@ export interface SampleCV {
 export const SAMPLE_CVS: SampleCV[] = [
   {
     id: 'sample-freshgrad',
-    title: 'Fresh Grad - Penuh Buzzwords & Nol Metrik',
+    title: 'Fresh Graduate - Banyak Teknologi, Minim Bukti',
     category: 'Fresh Graduate',
-    role: 'Frontend Developer',
+    role: 'Software Engineer',
     level: 'freshgrad',
-    description: 'Contoh CV klasik yang penuh kalimat klise seperti "hardworking", "team player", dan daftar tugas tanpa dampak nyata.',
-    cvText: `ALEX WIJAYA
-Email: alex.wijaya99@gmail.com | Phone: 08123456789 | Jakarta, Indonesia
-LinkedIn: linkedin.com/in/alex-wijaya
-
-TENTANG SAYA
-Saya adalah lulusan baru Teknik Informatika yang jujur, pekerja keras, berdedikasi tinggi, dapat bekerja secara individu maupun dalam tim, serta memiliki kemampuan komunikasi yang baik dan cepat belajar hal-hal baru. Sangat tertarik berkarir di bidang web development.
-
-PENGALAMAN KERJA / MAGANG
-Junior Web Developer Intern - PT Solusi Digital Maju (Januari 2024 - April 2024)
-- Bertanggung jawab membuat tampilan website menggunakan HTML, CSS, dan JavaScript.
-- Membantu senior developer dalam memperbaiki bug di website.
-- Ikut serta dalam rapat harian tim pengembangan.
-- Mengelola database dan memastikan website berjalan dengan lancar.
-
-PENGALAMAN ORGANISASI
-Anggota Divisi IT - Himpunan Mahasiswa Informatika (2022 - 2023)
-- Membantu menyukseskan acara seminar nasional kampus.
-- Menjadi panitia publikasi dan dokumentasi.
-
-KEAHLIAN & SKILL
-- Hard Skills: HTML, CSS, JavaScript, React, PHP, MySQL, Microsoft Word, Microsoft Excel
-- Soft Skills: Disiplin, Tanggung Jawab, Jujur, Kerja Keras, Time Management, Public Speaking
-
-PENDIDIKAN
-S1 Teknik Informatika - Universitas Bina Masa Depan (2020 - 2024)
-IPK: 3.45 / 4.00`,
-  },
-  {
-    id: 'sample-mid-dev',
-    title: 'Mid Software Engineer - Copy Paste Jobdesc',
-    category: 'Software Engineering',
-    role: 'Backend Engineer',
-    level: 'mid',
-    description: 'CV developer berpengalaman 3 tahun tapi isinya hanya daftar tugas rutin pasif tanpa angka performa, skala, atau metrik bisnis.',
-    cvText: `BUDI PRASETYO
-budi.prasetyo@email.com | +62 811 9876 5432 | Tangerang Selatan
-GitHub: github.com/budipras | Portfolio: budiprasetyo.dev
+    description:
+      'Contoh CV fresh graduate yang mencantumkan banyak teknologi tetapi belum menjelaskan proyek, kontribusi, atau hasil yang konkret.',
+    cvText: `MUHAMMAD DHYAUL ATHA
+Aceh, Indonesia
+GitHub: github.com/Bangkah
+LinkedIn: linkedin.com/in/muhammad-dhyaul-atha
 
 PROFESSIONAL SUMMARY
-Backend Engineer dengan pengalaman 3 tahun dalam mengembangkan aplikasi web dan REST API menggunakan Node.js, Express, dan PostgreSQL. Terbiasa bekerja dengan metodologi Agile/Scrum.
-
-WORK EXPERIENCE
-Backend Developer - TokoDigital Nusantara (Juni 2022 - Sekarang)
-- Mengembangkan RESTful API untuk modul pembayaran dan inventaris produk.
-- Melakukan integrasi third-party payment gateway seperti Midtrans dan Xendit.
-- Melakukan maintenance server dan memperbaiki bug yang dilaporkan tim QA.
-- Menulis unit testing untuk memastikan keandalan kode.
-- Berkolaborasi dengan Frontend Developer dan Product Manager dalam sprint mingguan.
-
-Junior Backend Developer - PT Inovasi Solusi Prima (Maret 2021 - Mei 2022)
-- Membuat endpoint backend menggunakan Express.js dan MongoDB.
-- Melakukan query database untuk kebutuhan laporan bulanan.
-- Membantu deployment aplikasi ke server AWS EC2.
+Fresh graduate yang memiliki ketertarikan pada software engineering, backend development, DevOps, Linux, dan cloud computing. Memiliki kemampuan belajar teknologi baru dengan cepat dan mampu bekerja secara mandiri maupun dalam tim.
 
 TECHNICAL SKILLS
-Languages: JavaScript, TypeScript, Golang (Dasar), SQL
-Frameworks & Tools: Node.js, Express.js, PostgreSQL, MongoDB, Redis, Docker, Git, Postman, AWS EC2
+Languages: JavaScript, TypeScript, Python, Go, Bash, SQL
+Frontend: React, Next.js, Vite, Tailwind CSS
+Backend: Node.js, Express.js, Go, REST API, gRPC
+Database: PostgreSQL, MySQL, Redis, Supabase
+DevOps: Git, GitHub Actions, Docker, CI/CD
+Infrastructure: Linux, Networking, Cloud Native
+Tools: GitHub, VS Code, Postman
+
+PROJECTS
+NetInfo
+- Membuat CLI utility untuk menampilkan informasi sistem dan jaringan Linux.
+- Menggunakan Bash untuk mengumpulkan informasi sistem dan network interface.
+- Mendokumentasikan penggunaan dan instalasi project.
+
+Personal Portfolio
+- Mengembangkan website portfolio menggunakan React dan Vite.
+- Menggunakan GitHub untuk version control.
+- Mengatur proses build dan deployment menggunakan CI/CD.
 
 EDUCATION
-Sarjana Komputer (S.Kom) - Universitas Mercu Buana (2017 - 2021)`,
+Politeknik Negeri Lhokseumawe
+Program Studi Teknologi Informasi
+
+CERTIFICATIONS & LEARNING
+- eBPF Getting Started - Isovalent
+- Cilium LB-IPAM & L2 - Isovalent
+- Microsoft Learn
+- Dicoding Indonesia
+
+INTERESTS
+Backend Engineering, DevOps, Linux, Cloud Native, Open Source, Platform Engineering`
   },
+
   {
-    id: 'sample-marketing',
-    title: 'Digital Marketer - Tanpa ROI & Data Analytics',
-    category: 'Marketing',
-    role: 'Digital Marketing Specialist',
+    id: 'sample-junior-overclaim',
+    title: 'Junior - Klaim Senior Tidak Sejalan dengan Bukti',
+    category: 'Software Engineering',
+    role: 'Senior DevOps Engineer',
     level: 'junior',
-    description: 'CV marketer yang hanya fokus pada aktivitas posting konten tanpa menyertakan ROAS, pertumbuhan follower berbayar vs organik, atau konversi sales.',
-    cvText: `SITI RAHMAWATI
-Jakarta | 0819 8765 4321 | siti.rahma@email.com
+    description:
+      'Contoh CV dengan technology stack yang terlihat advanced, tetapi pengalaman dan bukti proyek belum cukup mendukung klaim level senior.',
+    cvText: `MUHAMMAD DHYAUL ATHA
+Aceh, Indonesia
+GitHub: github.com/Bangkah
+LinkedIn: linkedin.com/in/muhammad-dhyaul-atha
 
-RINGKASAN
-Digital Marketing Specialist kreatif dengan passion tinggi dalam social media management, content creation, dan kampanye digital. Mahir mengoperasikan Meta Ads dan Google Ads.
+PROFESSIONAL SUMMARY
+Senior DevOps Enthusiast  dan Cloud Architect dengan sedikit keahlian dalam Kubernetes, AWS, Terraform, distributed systems, microservices, dan cloud-native infrastructure. mengoptimalkan infrastructure production.
 
-PENGALAMAN
-Digital Marketing Officer - PT Busana Trendy Indonesia (Agustus 2022 - Sekarang)
-- Membuat kalender konten bulanan untuk akun Instagram dan TikTok perusahaan.
-- Menjalankan iklan berbayar di Instagram Ads dan Facebook Ads.
-- Meningkatkan engagement akun media sosial secara berkala.
-- Bekerja sama dengan influencer dan Key Opinion Leader (KOL) untuk endorsement.
-- Mengatur photoshoot produk dan editing video promosi mingguan.
+TECHNICAL SKILLS
+Cloud: AWS, GCP, Azure
+Infrastructure: Kubernetes, Terraform, Helm, Ansible
+DevOps: Docker, GitHub Actions, ArgoCD, Prometheus, Grafana
+Backend: Go, Node.js, Python
+Architecture: Microservices, Distributed Systems, Event-Driven Architecture
+Networking: TCP/IP, DNS, Load Balancing, Service Mesh
 
-Content Creator Freelance (2021 - 2022)
-- Menulis artikel SEO untuk blog klien di industri kecantikan dan fashion.
-- Membuat desain feeds menggunakan Canva dan Photoshop.
+PROJECTS
+Cloud-Native Platform
+- Mendesain arsitektur Kubernetes production untuk aplikasi enterprise.
+- Mengimplementasikan multi-region deployment.
+- Menggunakan Terraform untuk seluruh infrastructure provisioning.
+- Mengimplementasikan observability menggunakan Prometheus dan Grafana.
 
-SKILLS
-Social Media Marketing, Meta Ads, Copywriting, Canva, CapCut, SEO Basic, Influencer Relations, Microsoft Office`,
+Microservices Platform
+- Mendesain sistem microservices menggunakan Go.
+- Menggunakan Kafka untuk event streaming.
+- Mengimplementasikan service mesh menggunakan Istio.
+
+OPEN SOURCE
+GitHub: github.com/Bangkah
+
+EDUCATION
+Politeknik Negeri Lhokseumawe
+
+NOTE
+Sebagian besar pengalaman cloud infrastructure dan enterprise architecture berasal dari personal projects, learning projects, dan eksperimen. Belum memiliki pengalaman profesional sebagai Senior DevOps Engineer atau Cloud Architect.`
   },
+
   {
-    id: 'sample-high-standard',
-    title: 'Senior Product Lead - Format Kuat & Berbobot',
+    id: 'sample-mid',
+    title: 'Mid Engineer - Teknologi Kuat, Impact Belum Terukur',
+    category: 'Software Engineering',
+    role: 'Backend / DevOps Engineer',
+    level: 'mid',
+    description:
+      'Contoh CV engineer dengan technical breadth yang kuat, tetapi sebagian besar bullet masih menjelaskan apa yang dikerjakan tanpa mengukur dampaknya.',
+    cvText: `MUHAMMAD DHYAUL ATHA
+Software Engineer | Backend | DevOps | Linux | Cloud Native
+
+GitHub: github.com/Bangkah
+LinkedIn: linkedin.com/in/muhammad-dhyaul-atha
+
+SUMMARY
+Software engineer dengan fokus pada backend engineering, DevOps, Linux, dan cloud-native technologies. Sedikit berpengalaman mengembangkan personal projects, open source software, automation, dan sistem backend menggunakan berbagai teknologi modern.
+
+TECHNICAL SKILLS
+Languages: Go, TypeScript, JavaScript, Python, Bash, SQL
+Backend: Node.js, Express.js, REST API, gRPC
+Frontend: React, Next.js, Vite
+Databases: PostgreSQL, MySQL, Redis, Supabase
+Infrastructure: Linux, Docker, GitHub Actions, CI/CD
+Cloud Native: Kubernetes, Cilium, eBPF
+Tools: Git, GitHub, VS Code
+
+SELECTED PROJECTS
+
+NetInfo
+- Mengembangkan CLI utility untuk Linux yang menampilkan informasi sistem dan jaringan.
+- Menggunakan Bash untuk mengumpulkan informasi network interface dan system information.
+- Menyediakan dokumentasi penggunaan dan instalasi.
+- Mempublikasikan project sebagai open source.
+
+OmniServe
+- Merancang control plane untuk mengelola server dan agent.
+- Menggunakan Next.js untuk administrative interface.
+- Menggunakan Go untuk backend API dan agent.
+- Menggunakan PostgreSQL sebagai database dan Redis sebagai cache.
+- Menggunakan gRPC/HTTPS dan mTLS untuk komunikasi agent.
+- Menyusun Software Requirements Specification dan risk register sebelum implementasi.
+
+CI/CD & Automation
+- Membuat GitHub Actions workflow untuk build, lint, audit, dan deployment.
+- Mengintegrasikan automated checks dalam software development workflow.
+- Menggunakan Docker dan container-based development workflow.
+
+OPEN SOURCE & COMMUNITY
+- Aktif mengembangkan dan memelihara repository GitHub.
+- Berkontribusi melalui Pull Request dan collaborative development.
+- Memiliki proyek open source yang digunakan sebagai media pembelajaran dan experimentation.
+
+CERTIFICATIONS & LEARNING
+- eBPF Getting Started - Isovalent
+- Cilium LB-IPAM & L2 - Isovalent
+- Dicoding Indonesia
+- Microsoft Learn
+
+EDUCATION
+Politeknik Negeri Lhokseumawe`
+  },
+
+  {
+    id: 'sample-benchmark',
+    title: 'Senior Benchmark - Impact & Architecture',
     category: 'Benchmark',
-    role: 'Senior Product Manager',
+    role: 'Senior Platform / DevOps Engineer',
     level: 'senior',
-    description: 'Contoh CV berstandar tinggi dengan formula Google X-Y-Z, metrik pertumbuhan konkrit, dan arsitektur kepemimpinan produk.',
-    cvText: `RADITYA ARYA, PM
-raditya.pm@alumni.id | +62 813 5555 7777 | Jakarta, Indonesia | linkedin.com/in/raditya-arya
+    description:
+      'Benchmark CV senior yang menunjukkan bagaimana pengalaman engineering dapat ditulis menggunakan scope, architecture, ownership, reliability, dan measurable impact.',
+    cvText: `MUHAMMAD DHYAUL ATHA
+Platform Engineering | DevOps | Backend | Linux | Cloud Native
+
+Aceh, Indonesia
+GitHub: github.com/Bangkah
+LinkedIn: linkedin.com/in/muhammad-dhyaul-atha
 
 EXECUTIVE SUMMARY
-Senior Product Manager dengan 6+ tahun pengalaman memimpin produk fintech & B2B SaaS bernilai jutaan dolar. Terbukti meningkatkan GMV sebesar 185% YoY, memangkas churn rate pengguna dari 8.4% ke 2.1%, dan memimpin 14 orang tim cross-functional (Engineering, Design, Data).
+Software engineer dengan fokus pada backend engineering, DevOps, Linux, dan cloud-native infrastructure. Memiliki sedikit pengalaman membangun software systems, developer tooling, automation, dan open source projects.
 
-PROFESSIONAL EXPERIENCE
-Senior Product Manager - PayNusantara (Seri B Fintech) | 2022 - Sekarang
-- Meluncurkan fitur Instant Merchant Payout yang meningkatkan transaksi bulanan sebesar 42% ($3.2M ARR baru) dalam 6 bulan pertama.
-- Memimpin inisiatif restrukturisasi onboarding KYC dengan Machine Learning OCR, memangkas drop-off rate dari 34% ke 8.5% dan mempercepat waktu verifikasi dari 48 jam ke <90 detik.
-- Mengelola product roadmap kuartalan untuk 3 squads engineering (18 engineers) dengan tingkat ketepatan sprint delivery 96%.
-
-Product Manager - Kredita Solusi | 2019 - 2022
-- Merancang ulang alur pengajuan pinjaman UMKM berbasis credit scoring alternatif, melipatgandakan loan disbursement dari Rp12 Miliar ke Rp48 Miliar/bulan tanpa kenaikan rasio NPL (<1.2%).
-- Menginisiasi sistem automasi pengingat via WhatsApp & push notification, mendongkrak tingkat repayment tepat waktu sebesar 28%.
+Mengembangkan project dengan pendekatan engineering yang mencakup architecture design, API development, database design, CI/CD, containerization, security, observability, dan infrastructure automation.
 
 CORE COMPETENCIES
-Product Strategy, Unit Economics, A/B Testing & Experimentation, SQL & Amplitude, Wireframing (Figma), Agile/Scrum, Stakeholder Management, Go-To-Market (GTM)
+Backend Engineering
+Platform Engineering
+DevOps & CI/CD
+Linux Systems
+Cloud Native
+System Architecture
+Networking
+Infrastructure Automation
+Open Source Development
+Security & mTLS
 
-EDUCATION & CERTIFICATIONS
-- B.Sc in Computer Science - Institut Teknologi Bandung (Cum Laude, GPA: 3.82)
-- Certified Scrum Product Owner (CSPO) & Reforge Product Strategy Alum`,
+SELECTED ENGINEERING PROJECTS
+
+OMNISERVE — Server Management Control Plane
+Role: System Architect / Backend Developer
+
+- Merancang control plane untuk mengelola server melalui centralized management architecture.
+- Mendesain backend API menggunakan Go dengan PostgreSQL sebagai primary database dan Redis sebagai caching layer.
+- Mendesain agent architecture menggunakan Go dengan komunikasi gRPC/HTTPS.
+- Menggunakan mTLS sebagai security boundary antara control plane dan server agent.
+- Menyusun 37 functional requirements dan 22 non-functional requirements sebelum implementasi.
+- Mengidentifikasi 21 risiko sistem melalui risk register dan menentukan mitigation strategy untuk risiko kritis.
+- Mendesain deployment architecture dan trust boundaries antar komponen sistem.
+
+NETINFO — Linux System & Network Information CLI
+Role: Open Source Maintainer
+
+- Mengembangkan CLI utility untuk Linux yang mengumpulkan informasi sistem dan network environment.
+- Menggunakan Bash untuk system inspection dan network information gathering.
+- Menulis dokumentasi penggunaan dan instalasi.
+- Memelihara repository open source dan menerima kontribusi melalui GitHub.
+
+CI/CD & DEVELOPER AUTOMATION
+
+- Mendesain GitHub Actions workflow untuk automated build, linting, dependency audit, dan deployment.
+- Mengintegrasikan CI checks ke dalam repository development workflow.
+- Menggunakan Docker dan container-based development.
+- Menggunakan GitHub Pull Request workflow untuk collaboration dan code review.
+
+CLOUD NATIVE & LINUX
+
+- Mempelajari dan bereksperimen dengan eBPF dan Cilium.
+- Menyelesaikan learning path terkait eBPF dan Cilium melalui Isovalent.
+- Memahami konsep container networking, load balancing, Linux networking, dan cloud-native infrastructure.
+- Mengembangkan ketertarikan pada platform engineering dan infrastructure automation.
+
+TECHNICAL STACK
+
+Languages:
+Go, TypeScript, JavaScript, Python, Bash, SQL
+
+Backend:
+Node.js, Express.js, Go, REST API, gRPC
+
+Frontend:
+React, Next.js, Vite, Tailwind CSS
+
+Databases:
+PostgreSQL, MySQL, Redis, Supabase
+
+Infrastructure:
+Linux, Docker, GitHub Actions, CI/CD
+
+Cloud Native:
+Kubernetes, Cilium, eBPF
+
+Tools:
+Git, GitHub, VS Code, Postman
+
+OPEN SOURCE
+
+GitHub: github.com/Bangkah
+
+- Open source maintainer
+- Pull Request based collaboration
+- Continuous Integration
+- Project documentation
+- Developer tooling
+
+EDUCATION
+
+Politeknik Negeri Lhokseumawe
+
+CERTIFICATIONS & LEARNING
+
+- eBPF Getting Started — Isovalent
+- Cilium LB-IPAM & L2 — Isovalent
+- Dicoding Indonesia
+- Microsoft Learn
+
+CAREER DIRECTION
+
+Backend Engineering
+DevOps Enthusiast 
+Platform Engineering
+Cloud Native Infrastructure
+Linux Systems
+Open Source Software`
   },
 ];

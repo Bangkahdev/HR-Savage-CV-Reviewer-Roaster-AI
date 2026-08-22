@@ -62,7 +62,7 @@ Sistem penilaian menggunakan skala **0 - 100 poin** yang terbagi dalam 5 dimensi
 | **Career Story & Relevance** | 0 - 20 | Alur perkembangan karir yang logis, narasi kepemimpinan, dan relevansi pengalaman. |
 
 ### Klasifikasi Grade
-- **90 - 100 (Grade S):** Portofolio & CV kelas dunia, sangat kompetitif di FAANG / Global Unicorn.
+- **90 - 100 (Grade S):** Portofolio & CV kelas dunia, sangat kompetitif di BANGKAH / Global Unicorn.
 - **80 - 89 (Grade A):** Sangat kuat, profil terstruktur dengan metrik bisnis yang jelas.
 - **70 - 79 (Grade B):** Bagus, terdapat metrik namun perlu penajaman formula Google X-Y-Z.
 - **55 - 69 (Grade C):** Rata-rata / Medioker, banyak deskripsi tugas pasif dan minim dampak bisnis.
@@ -97,7 +97,7 @@ Sistem penilaian menggunakan skala **0 - 100 poin** yang terbagi dalam 5 dimensi
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/username/hr-savage-cv-roaster.git
+git clone https://github.com/Bangkah/hr-savage-cv-roaster.git
 cd hr-savage-cv-roaster
 ```
 

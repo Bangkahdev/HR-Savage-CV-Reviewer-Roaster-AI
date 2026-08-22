@@ -5,9 +5,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   Globe,
-  Linkedin,
-  Twitter,
-  Github,
+  Briefcase,
+  MessageSquare,
+  Code2,
   Flame,
   Sparkles,
   ArrowRight,
@@ -46,20 +46,20 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
   const [copiedRoast, setCopiedRoast] = useState(false);
 
   const handleFillSample = () => {
-    setCandidateName("Budi Pratama");
-    setTargetRole("Senior Frontend Engineer");
+    setCandidateName("Muhammad Dhiyaul Atha");
+    setTargetRole("Open Source Enthusiast  & DevOps Engineer");
     setCvText(
-      "Senior Frontend Engineer dengan 5+ tahun pengalaman memimpin arsitektur React & Next.js di unicorn, berhasil menaikkan performa 300%, ahli Micro-frontends, GraphQL, CI/CD, dan Docker."
+       "Open Source Enthusiast  dengan fokus pada DevOps, backend engineering, Linux, dan cloud-native technologies. sedikit berpengalaman membangun dan mengembangkan aplikasi berbasis React, Next.js, Node.js, Go, PostgreSQL, Supabase, serta tooling Linux. Aktif mengembangkan proyek open source seperti NetInfo dan berbagai proyek personal, serta memiliki pengalaman dengan GitHub Actions, CI/CD, Docker, Redis, dan arsitektur sistem."
     );
     setLinkedinUrlOrBio(
-      "linkedin.com/in/budipratama - Headline: 'Aspiring Web Developer | Belajar Javascript | Ex-Intern di Web Agency (6 bulan)'"
+      "https://www.linkedin.com/in/muhammad-dhyaul-atha/ - Headline: 'Open Source Enthusiast  | DevOps & Backend | Linux | Cloud Native'"
     );
     setTwitterUrlOrBio(
-      "@budicoding - Sering tweet: 'Aduh pusing banget belajar useState', 'Kapan ya bisa dapet kerja pertama', 'Kenapa Docker susah banget ampun'."
+      "@mdhiyaulatha - Berbagi proses belajar software engineering, Linux, open source, DevOps, backend, dan cloud-native technologies."
     );
-    setGithubUrlOrBio("github.com/budipratama - Repos: todo-app-react, clone-netflix-tutorial, calculator-html");
-    setPortfolioOrBlog("budipratama.vercel.app - Portofolio template gratisan, kontak form belum aktif");
-    setAdditionalNotes("Pernah aktif di forum komplain soal wawancara kerja yang terlalu susah.");
+    setGithubUrlOrBio("github.com/Bangkahdev - projects: NetInfo, bangkah-launcher, Atha");
+    setPortfolioOrBlog("https://mdhiyaulatha.me - Portfolio pribadi Berisi proyek software engineering dan dokumentasi pembelajaran di bidang backend, DevOps, Linux, dan open source.");
+    setAdditionalNotes("Memiliki pengalaman belajar dan mengembangkan sistem menggunakan Linux, Git/GitHub, GitHub Actions, Docker, Node.js, Go, PostgreSQL, Redis, Supabase, React, Next.js, dan teknologi cloud-native. Pernah mengikuti pembelajaran dan mendapatkan credential terkait eBPF, Cilium, serta pengembangan software.");
     setErrorMessage(null);
   };
 
@@ -365,7 +365,7 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
                   type="text"
                   value={candidateName}
                   onChange={(e) => setCandidateName(e.target.value)}
-                  placeholder="Contoh: Budi Pratama"
+                  placeholder="Contoh: Muhammad Dhiyaul Atha"
                   className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs focus:outline-none focus:border-red-500 shadow-inner"
                 />
               </div>
@@ -406,7 +406,7 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center gap-1.5">
-                  <Linkedin className="w-3.5 h-3.5 text-blue-400" /> LinkedIn URL atau Headline &amp; Riwayat Bio
+                  <Briefcase  className="w-3.5 h-3.5 text-blue-400" /> LinkedIn URL atau Headline &amp; Riwayat Bio
                 </label>
                 <input
                   type="text"
@@ -419,7 +419,7 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center gap-1.5">
-                  <Twitter className="w-3.5 h-3.5 text-sky-400" /> X (Twitter) Akun atau Kebiasaan Postingan
+                  <MessageSquare  className="w-3.5 h-3.5 text-sky-400" /> X (Twitter) Akun atau Kebiasaan Postingan
                 </label>
                 <input
                   type="text"
@@ -432,7 +432,7 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center gap-1.5">
-                  <Github className="w-3.5 h-3.5 text-zinc-300" /> GitHub URL / Profil Tech
+                  <Code2  className="w-3.5 h-3.5 text-zinc-300" /> GitHub URL / Profil Tech
                 </label>
                 <input
                   type="text"

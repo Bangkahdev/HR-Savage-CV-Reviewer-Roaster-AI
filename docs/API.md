@@ -239,7 +239,7 @@ interface GitHubRoastRequest {
     "suggestedProjectTitle": "High-Throughput Distributed Task Queue in Go",
     "techStack": ["Golang", "Redis", "gRPC", "Docker"],
     "architectureHighlights": ["Raft consensus algorithm", "Benchmarking 100k req/s", "Prometheus metrics"],
-    "whyItImpressesFAANG": "Membuktikan kemampuan mengelola concurrency dan sistem terdistribusi nyata."
+    "whyItImpressesBANGKAH": "Membuktikan kemampuan mengelola concurrency dan sistem terdistribusi nyata."
   }
 }
 ```

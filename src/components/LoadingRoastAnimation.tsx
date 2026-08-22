@@ -7,7 +7,7 @@ const LOADING_STEPS = [
   "Detecting generic buzzwords ('hardworking', 'team player', 'responsible for')...",
   "Calculating quantitative impact density & Google X-Y-Z formula...",
   "Simulating ATS Parser (Workday / Greenhouse / Lever / Taleo)...",
-  "Compiling reality check, brutal roast & FAANG-grade rewrite...",
+  "Compiling reality check, brutal roast & BANGKAH-grade rewrite...",
 ];
 
 export const LoadingRoastAnimation: React.FC = () => {

@@ -51,7 +51,7 @@ Aplikasi ini menggunakan arsitektur **Full-Stack Single-Page Application (SPA)**
   - ATS Keyword Matcher & Gap Analysis.
   - Step-by-Step Action Plan & Full Rewrite Snippet.
 - **`DigitalFootprintSection.tsx`**: Form cross-check jejak digital dan visualisasi *Digital Hygiene Score*.
-- **`GitHubRoasterSection.tsx`**: Modul roasting teknis programmer dengan diagnosa *Tutorial Hell*, audit commit, dan blueprint proyek FAANG.
+- **`GitHubRoasterSection.tsx`**: Modul roasting teknis programmer dengan diagnosa *Tutorial Hell*, audit commit, dan blueprint proyek BANGKAH.
 - **`InteractiveHRConsultant.tsx`**: Widget chat live dengan persona Recruiter Director.
 - **`BulletRewriterModal.tsx`**: Modal interaktif untuk merombak kalimat CV individual secara cepat.
 
