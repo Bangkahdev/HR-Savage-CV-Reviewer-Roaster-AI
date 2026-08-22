@@ -57,7 +57,7 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
     setTwitterUrlOrBio(
       "@mdhiyaulatha - Berbagi proses belajar software engineering, Linux, open source, DevOps, backend, dan cloud-native technologies."
     );
-    setGithubUrlOrBio("github.com/bangkahdev - - github.com/Bangkah projects: NetInfo, bangkah-launcher, Atha");
+    setGithubUrlOrBio("github.com/bangkahdev - - github.com/Bangkah projects: NetInfo, bangkah-launcher, Atha, HR-Savage-CV-Reviewer-Roaster-AI");
     setPortfolioOrBlog("https://mdhiyaulatha.me - Portfolio pribadi Berisi proyek software engineering dan dokumentasi pembelajaran di bidang backend, DevOps, Linux, dan open source.");
     setAdditionalNotes("Memiliki pengalaman belajar dan mengembangkan sistem menggunakan Linux, Git/GitHub, GitHub Actions, Docker, Node.js, Go, PostgreSQL, Redis, Supabase, React, Next.js, dan teknologi cloud-native. Pernah mengikuti pembelajaran dan mendapatkan credential terkait eBPF, Cilium, serta pengembangan software.");
     setErrorMessage(null);
