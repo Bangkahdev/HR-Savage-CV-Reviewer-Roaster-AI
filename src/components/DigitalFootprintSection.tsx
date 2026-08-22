@@ -49,7 +49,7 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
     setCandidateName("Muhammad Dhiyaul Atha");
     setTargetRole("Open Source Enthusiast  & DevOps Engineer");
     setCvText(
-       "Open Source Enthusiast  dengan fokus pada DevOps, backend engineering, Linux, dan cloud-native technologies. sedikit berpengalaman membangun dan mengembangkan aplikasi berbasis React, Next.js, Node.js, Go, PostgreSQL, Supabase, serta tooling Linux. Aktif mengembangkan proyek open source seperti NetInfo dan berbagai proyek personal, serta memiliki pengalaman dengan GitHub Actions, CI/CD, Docker, Redis, dan arsitektur sistem."
+       "Open Source Enthusiast  dengan fokus pada DevOps, backend engineering, Linux, dan cloud-native technologies. sedikit berpengalaman membangun dan mengembangkan aplikasi berbasis React, Next.js, Node.js, Go, PostgreSQL, Supabase, serta tooling Linux. Aktif mengembangkan proyek open source seperti NetInfo, Atha dan berbagai proyek personal juga membuat dokumentasi lengkap, serta memiliki pengalaman dengan GitHub Actions, CI/CD, Docker, Redis, dan arsitektur sistem."
     );
     setLinkedinUrlOrBio(
       "https://www.linkedin.com/in/muhammad-dhyaul-atha/ - Headline: 'Open Source Enthusiast  | DevOps & Backend | Linux | Cloud Native'"
@@ -57,7 +57,7 @@ export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = (
     setTwitterUrlOrBio(
       "@mdhiyaulatha - Berbagi proses belajar software engineering, Linux, open source, DevOps, backend, dan cloud-native technologies."
     );
-    setGithubUrlOrBio("github.com/Bangkahdev - projects: NetInfo, bangkah-launcher, Atha");
+    setGithubUrlOrBio("github.com/bangkahdev - - github.com/Bangkah projects: NetInfo, bangkah-launcher, Atha");
     setPortfolioOrBlog("https://mdhiyaulatha.me - Portfolio pribadi Berisi proyek software engineering dan dokumentasi pembelajaran di bidang backend, DevOps, Linux, dan open source.");
     setAdditionalNotes("Memiliki pengalaman belajar dan mengembangkan sistem menggunakan Linux, Git/GitHub, GitHub Actions, Docker, Node.js, Go, PostgreSQL, Redis, Supabase, React, Next.js, dan teknologi cloud-native. Pernah mengikuti pembelajaran dan mendapatkan credential terkait eBPF, Cilium, serta pengembangan software.");
     setErrorMessage(null);
