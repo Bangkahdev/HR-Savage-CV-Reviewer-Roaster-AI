@@ -165,18 +165,100 @@ export interface RepoTeardown {
   howToFix: string;
 }
 
+export interface GitHubAchievementItem {
+  title: string;
+  status: string;
+  badge: string;
+  description: string;
+  roastComment: string;
+}
+
+export interface GitHubRoadmapMilestone {
+  timeframe: string;
+  milestoneTitle: string;
+  actionItems: string[];
+  expectedImpact: string;
+}
+
+export interface GitHubHRVerdict {
+  hiringDecision?: string;
+  recruiterVerdict?: string;
+  salaryNegotiationImpact?: string;
+  salaryNegotiationPower?: string;
+  hrRedFlags?: string[];
+  hrGreenFlags?: string[];
+  interviewSurvivability?: number;
+  cvVsGithubIntegrityCheck?: string;
+  first6SecondsRoast?: string;
+}
+
+export interface GitHubHistoryAudit {
+  accountAge?: string;
+  commitStreakRoast?: string;
+  peakActivityPeriod?: string;
+  dormancyWarning?: string;
+  prAndIssuesRoast?: string;
+  commitFrequencyAnalysis?: string;
+  commitMessageRoast?: string;
+  activeHabitsPattern?: string;
+  prAndIssuesCollaboration?: string;
+  greenSquareVerdict?: string;
+}
+
+export interface GitHubFullActivityBreakdown {
+  pullRequestsCount: number;
+  mergedPRsCount: number;
+  openIssuesCount: number;
+  starredReposCount: number;
+  forksGivenOrReceived: string;
+  codeReviewAndDiscussions: string;
+  communityEngagementGrade: 'A+' | 'A' | 'B' | 'C' | 'D' | 'F';
+  activitySummaryRoast: string;
+}
+
 export interface GitHubRoastResult {
   username: string;
+  auditMode?: 'general_profile' | 'targeted_role';
+  detectedDeveloperRole?: string;
+  targetRoleEvaluated?: string;
+  realNameOrBio?: string;
+  avatarUrl?: string;
   devScore: number;
   devTier: string;
   verdictTag: string;
   brutalRoast: string;
+  activityBreakdown?: GitHubFullActivityBreakdown;
+  profileSummary?: {
+    avatarUrl?: string;
+    name?: string;
+    bio?: string;
+    company?: string;
+    location?: string;
+    followers?: number;
+    following?: number;
+    publicRepos?: number;
+    accountAgeYears?: number;
+    createdAt?: string;
+    profileUrl?: string;
+  };
   metricsAudit: {
     repoCount: number;
     starsTotal: number;
+    forksTotal?: number;
+    followersCount?: number;
+    followingCount?: number;
     topLanguages: string[];
     commitConsistencyScore: number;
     readmeQualityScore: number;
+    openSourceContributionScore?: number;
+  };
+  hrVerdict?: GitHubHRVerdict;
+  historyAudit?: GitHubHistoryAudit;
+  achievementsAudit?: GitHubAchievementItem[] | {
+    detectedBadgesOrAchievements?: string[];
+    reputationTier?: string;
+    starsVsForksRatioRoast?: string;
+    communityInfluence?: string;
   };
   roastCategories: {
     tutorialHellDiagnosis: {
@@ -202,4 +284,17 @@ export interface GitHubRoastResult {
     architectureSuggested: string;
     whyRecruitersLoveIt: string;
   }>;
+  futureCareerRoadmap?: GitHubRoadmapMilestone[];
+  futureRoadmap?: {
+    thirtyDayEmergencyPlan?: string[];
+    sixtyDayProductionProjects?: Array<{
+      projectName: string;
+      targetRoleAlignment: string;
+      architecture: string;
+      killerFeatures: string[];
+      whyItImpressesHR: string;
+    }>;
+    ninetyDayOpenSourceAndAuthority?: string[];
+    readmeTransformationGuide?: string;
+  };
 }

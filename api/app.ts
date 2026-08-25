@@ -314,7 +314,7 @@ app.post("/api/audit-digital-footprint", async (req, res) => {
     const ai = getGeminiClient();
 
     const systemInstruction = `
-Kamu adalah "Lead Background Investigator & Digital Intelligence Specialist" untuk Executive Recruiter dan FAANG.
+Kamu adalah "Lead Background Investigator & Digital Intelligence Specialist" untuk Executive Recruiter dan BANGKAH.
 Tugasmu adalah melakukan cross-check antara klaim di CV dengan jejak digital (LinkedIn, X/Twitter, GitHub, Portfolio) untuk mendeteksi kontradiksi, kepalsuan, atau red flag online.
 
 Format respon HARUS berupa JSON murni dengan skema:
@@ -440,23 +440,54 @@ app.post("/api/roast-github", async (req, res) => {
           );
           const reposData = reposRes.ok ? await reposRes.json() : [];
 
-          // Fetch recent public events to extract real commit messages & activity
+          // Fetch public events (up to 100)
           const eventsRes = await fetch(
             `https://api.github.com/users/${encodeURIComponent(username)}/events/public?per_page=100`,
             { headers }
           );
           const eventsData = eventsRes.ok ? await eventsRes.json() : [];
 
-          // Extract real recent commit messages & event types
+          // Fetch starred repos count (checking user starred list)
+          let starredReposCount = 0;
+          try {
+            const starredRes = await fetch(
+              `https://api.github.com/users/${encodeURIComponent(username)}/starred?per_page=100`,
+              { headers }
+            );
+            if (starredRes.ok) {
+              const starredData = await starredRes.json();
+              starredReposCount = Array.isArray(starredData) ? starredData.length : 0;
+            }
+          } catch {
+            // Ignore if starred fetch fails
+          }
+
+          // Fetch gists count
+          let publicGistsCount = userData.public_gists || 0;
+
+          // Extract granular activity stats
           const realCommitMessages: string[] = [];
+          const prActionDetails: Array<{ repo: string; action: string; title: string; merged: boolean }> = [];
+          const issueActionDetails: Array<{ repo: string; action: string; title: string }> = [];
+          const watchStarActions: Array<{ repo: string; date: string }> = [];
+          const forkActions: Array<{ repo: string; forkedTo: string }> = [];
+          const issueCommentsCount: number[] = [];
+
           let pushEventsCount = 0;
           let prEventsCount = 0;
+          let mergedPrCount = 0;
+          let closedPrCount = 0;
+          let openedPrCount = 0;
           let issuesEventsCount = 0;
           let createEventsCount = 0;
           let watchEventsCount = 0;
+          let forkEventsCount = 0;
+          let releaseEventsCount = 0;
+          let commentEventsCount = 0;
 
           if (Array.isArray(eventsData)) {
             for (const ev of eventsData) {
+              const repoName = ev.repo?.name || "Unknown Repo";
               if (ev.type === "PushEvent") {
                 pushEventsCount++;
                 if (ev.payload?.commits) {
@@ -471,12 +502,56 @@ app.post("/api/roast-github", async (req, res) => {
                 }
               } else if (ev.type === "PullRequestEvent") {
                 prEventsCount++;
+                const action = ev.payload?.action || "unknown";
+                const isMerged = Boolean(ev.payload?.pull_request?.merged);
+                const title = ev.payload?.pull_request?.title || "";
+                if (isMerged || action === "closed") {
+                  if (isMerged) mergedPrCount++;
+                  else closedPrCount++;
+                } else if (action === "opened") {
+                  openedPrCount++;
+                }
+                if (prActionDetails.length < 10) {
+                  prActionDetails.push({
+                    repo: repoName,
+                    action,
+                    title: title.slice(0, 80),
+                    merged: isMerged,
+                  });
+                }
               } else if (ev.type === "IssuesEvent") {
                 issuesEventsCount++;
-              } else if (ev.type === "CreateEvent") {
-                createEventsCount++;
+                const action = ev.payload?.action || "activity";
+                const title = ev.payload?.issue?.title || "";
+                if (issueActionDetails.length < 10) {
+                  issueActionDetails.push({
+                    repo: repoName,
+                    action,
+                    title: title.slice(0, 80),
+                  });
+                }
               } else if (ev.type === "WatchEvent") {
                 watchEventsCount++;
+                if (watchStarActions.length < 10) {
+                  watchStarActions.push({
+                    repo: repoName,
+                    date: ev.created_at || "",
+                  });
+                }
+              } else if (ev.type === "ForkEvent") {
+                forkEventsCount++;
+                if (forkActions.length < 10) {
+                  forkActions.push({
+                    repo: repoName,
+                    forkedTo: ev.payload?.forkee?.full_name || "Fork",
+                  });
+                }
+              } else if (ev.type === "CreateEvent") {
+                createEventsCount++;
+              } else if (ev.type === "ReleaseEvent") {
+                releaseEventsCount++;
+              } else if (ev.type === "IssueCommentEvent" || ev.type === "CommitCommentEvent" || ev.type === "PullRequestReviewCommentEvent") {
+                commentEventsCount++;
               }
             }
           }
@@ -610,6 +685,24 @@ app.post("/api/roast-github", async (req, res) => {
             topLanguages: topLanguagesSorted.length > 0 ? topLanguagesSorted : ["Belum ada bahasa terdeteksi"],
             repos: mappedRepos,
             recentCommitMessages: realCommitMessages.slice(0, 20),
+            fullActivityAudit: {
+              pushEventsCount,
+              prEventsCount,
+              mergedPrCount,
+              closedPrCount,
+              openedPrCount,
+              issuesEventsCount,
+              starredReposCount,
+              publicGistsCount,
+              watchEventsCount,
+              forkEventsCount,
+              releaseEventsCount,
+              commentEventsCount,
+              prActionDetails,
+              issueActionDetails,
+              watchStarActions,
+              forkActions,
+            },
             commitHygieneStats: {
               totalCommitsSampled: realCommitMessages.length,
               structuredConventionalCommits: structuredCommitCount,
@@ -641,7 +734,7 @@ app.post("/api/roast-github", async (req, res) => {
     const ai = getGeminiClient();
 
     const systemInstruction = `
-Kamu adalah "FAANG Principal Software Architect & Head of Executive Technical Hiring".
+Kamu adalah "BANGKAH Principal Software Architect & Head of Executive Technical Hiring".
 Karaktermu: Sangat analitis, akurat 100% berbasis data faktual, berwawasan mendalam mengenai arsitektur kode dan standar rekrutmen industri tech global, dengan selera humor pedas (savage & witty) namun memberikan kritik yang sangat berbobot, terukur, dan solutif.
 
 STATUS MODE AUDIT: ${
@@ -686,6 +779,16 @@ KEMBALIKAN HANYA JSON VALID SESUAI SKEMA BERIKUT:
   "devTier": "<Production Hardened Chad / Senior Architect / Solid Mid-Level / Junior CRUD Specialist / Tutorial Hell Survivor / Ghost Developer>",
   "verdictTag": "<Tag vonis tajam misal: ARCHITECTURAL GIGACHAD / FORK COLLECTOR / PRODUCTION BUILDER / CODE SLEEPWALKER / SOLID FULLSTACK CRAFTSMAN>",
   "brutalRoast": "<Paragraf analisis & roasting tajam yang 100% didasarkan pada data faktual akun, kualitas repo, commit hygiene, dan kebiasaan koding nyata akun ini>",
+  "activityBreakdown": {
+    "pullRequestsCount": <angka total event PR>,
+    "mergedPRsCount": <angka PR yang berhasil di-merge>,
+    "openIssuesCount": <angka event issues/tiket>,
+    "starredReposCount": <angka repo yang di-star/di-bookmark oleh user>,
+    "forksGivenOrReceived": "<Penilaian tajam tentang aktivitas fork & kolaborasi>",
+    "codeReviewAndDiscussions": "<Evaluasi keterlibatan di review PR dan komentar diskusi issue>",
+    "communityEngagementGrade": "<A+ / A / B / C / D / F>",
+    "activitySummaryRoast": "<Roasting pedas dan tajam merangkum seluruh spektrum aktivitas developer (bukan cuma commit, tapi PR, merge, stars, issue, diskusi)>"
+  },
   "metricsAudit": {
     "repoCount": <angka total repo publik>,
     "starsTotal": <angka total bintang asli>,
@@ -774,7 +877,7 @@ KEMBALIKAN HANYA JSON VALID SESUAI SKEMA BERIKUT:
       "techStack": ["<Bahasa & teknologi repo ini>"],
       "roast": "<Kritik teknis mendalam mengenai arsitektur, tujuan, dan kualitas repo ini>",
       "verdict": "<CRINGE / BUTUH KERJA KERAS / LUMAYAN / IMPRESIF / FORK_ONLY>",
-      "howToFix": "<Saran spesifik standar industri tech untuk meningkatkan repo ini menjadi standar FAANG/Unicorn>"
+      "howToFix": "<Saran spesifik standar industri tech untuk meningkatkan repo ini menjadi standar BANGKAH/Unicorn>"
     }
   ],
   "portfolioUpgradeBlueprint": [
@@ -854,8 +957,28 @@ METRIK HIGIENIS COMMIT & AKTIVITAS:
 - Total Sampel Commit Terdeteksi: ${fetchedGithubData.commitHygieneStats.totalCommitsSampled}
 - Commit Berstandar Semantic/Conventional (feat:, fix:, etc): ${fetchedGithubData.commitHygieneStats.structuredConventionalCommits}
 - Commit Malas Satu Kata ("update", "fix", "wip", etc): ${fetchedGithubData.commitHygieneStats.lazySingleWordCommits}
-- Aktivitas Pull Request Baru: ${fetchedGithubData.commitHygieneStats.prEventsCount} PR
-- Aktivitas Issues: ${fetchedGithubData.commitHygieneStats.issuesEventsCount} issues
+- Total Event Push: ${fetchedGithubData.fullActivityAudit?.pushEventsCount || 0}
+- Total Event Pull Request: ${fetchedGithubData.fullActivityAudit?.prEventsCount || 0} (Merged: ${fetchedGithubData.fullActivityAudit?.mergedPrCount || 0}, Opened: ${fetchedGithubData.fullActivityAudit?.openedPrCount || 0}, Closed: ${fetchedGithubData.fullActivityAudit?.closedPrCount || 0})
+- Total Event Issues / Diskusi: ${fetchedGithubData.fullActivityAudit?.issuesEventsCount || 0}
+- Total Repositori Yang Di-Star / Bookmark oleh User: ${fetchedGithubData.fullActivityAudit?.starredReposCount || 0} repo
+- Total Public Gists: ${fetchedGithubData.fullActivityAudit?.publicGistsCount || 0}
+- Total Fork Event: ${fetchedGithubData.fullActivityAudit?.forkEventsCount || 0}
+- Total Watch/Star Event: ${fetchedGithubData.fullActivityAudit?.watchEventsCount || 0}
+- Total Komentar Diskusi (PR/Issue/Commit): ${fetchedGithubData.fullActivityAudit?.commentEventsCount || 0}
+
+RINCIAN EVENT PR & MERGE NYATA:
+${
+  fetchedGithubData.fullActivityAudit?.prActionDetails && fetchedGithubData.fullActivityAudit.prActionDetails.length > 0
+    ? fetchedGithubData.fullActivityAudit.prActionDetails.map((p: any, i: number) => `${i + 1}. [${p.repo}] Action: ${p.action} | Merged: ${p.merged ? "YES" : "NO"} | Title: "${p.title}"`).join("\n")
+    : "Tidak ada event Pull Request publik terbaru."
+}
+
+RINCIAN EVENT ISSUE & DISKUSI NYATA:
+${
+  fetchedGithubData.fullActivityAudit?.issueActionDetails && fetchedGithubData.fullActivityAudit.issueActionDetails.length > 0
+    ? fetchedGithubData.fullActivityAudit.issueActionDetails.map((iss: any, i: number) => `${i + 1}. [${iss.repo}] Action: ${iss.action} | Title: "${iss.title}"`).join("\n")
+    : "Tidak ada event issue publik terbaru."
+}
 
 DAFTAR REPOSITORI ASLI LENGKAP (HANYA GUNAKAN NAMA-NAMA BERIKUT DI repoTeardowns):
 ${
@@ -975,7 +1098,7 @@ app.post("/api/rewrite-bullet", async (req, res) => {
     const ai = getGeminiClient();
 
     const prompt = `
-Ubah kalimat pengalaman kerja CV ini menjadi 3 variasi standar emas FAANG/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
+Ubah kalimat pengalaman kerja CV ini menjadi 3 variasi standar emas BANGKAH/Top Global Company menggunakan formula STAR dan Google X-Y-Z (Accomplished [X] as measured by [Y], by doing [Z]).
 
 Kalimat Asli: "${bulletText}"
 Target Role: ${role}
