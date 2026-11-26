@@ -141,29 +141,29 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
 
   return (
     <div className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
-      {/* Bento Top Header Intro Banner */}
-      <div className="bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden shadow-2xl backdrop-blur-xl">
-        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-          <Flame className="w-48 h-48 text-red-500" />
+      {/* Soft Intro Banner */}
+      <div className="bg-white border border-slate-200/80 rounded-3xl p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 soft-shadow-lg relative overflow-hidden page-fade">
+        <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+          <Flame className="w-48 h-48 text-coral-200" />
         </div>
 
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-950/80 border border-zinc-800 text-red-400 text-xs font-bold uppercase tracking-widest mb-3">
-            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            Industry Score & Reality Check
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-coral-50 border border-coral-200 text-coral-700 text-xs font-black uppercase tracking-widest mb-4">
+            <div className="w-2 h-2 rounded-full bg-coral-500 animate-pulse"></div>
+            Industri Score & Reality Check
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white uppercase tracking-tight">
-            Roast My CV <span className="text-red-500">Zero Mercy</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tight">
+            Roast My CV <span className="text-coral-600">Zero Mercy</span>
           </h2>
-          <p className="mt-2 text-zinc-400 text-xs sm:text-sm leading-relaxed">
+          <p className="mt-3 text-slate-600 text-sm leading-relaxed">
             Evaluasi CV berstandar rekruter BANGKAH & Fortune 500. Dapatkan skor industri objektif, simulasi parser ATS, detoks buzzwords instan, dan formula Google X-Y-Z otomatis.
           </p>
         </div>
 
-        {/* Quick Sample Presets in Bento Tile */}
-        <div className="w-full md:w-auto bg-zinc-950/90 border border-zinc-800/90 p-4 rounded-xl flex flex-col gap-2 shadow-inner">
-          <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-amber-400" /> Quick Test Samples
+        {/* Quick Sample Presets */}
+        <div className="w-full md:w-auto bg-slate-50 border border-slate-200 p-5 rounded-3xl flex flex-col gap-3 soft-shadow">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-coral-400" /> Quick Test Samples
           </span>
           <div className="grid grid-cols-2 gap-2">
             {SAMPLE_CVS.map((sample) => (
@@ -171,7 +171,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                 key={sample.id}
                 type="button"
                 onClick={() => handleSelectSample(sample.id)}
-                className="px-3 py-2 text-[11px] font-bold rounded-lg bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/60 transition-all text-left truncate cursor-pointer hover:border-red-500/40 shadow-sm"
+                className="px-3 py-2 text-[11px] font-bold rounded-2xl bg-white hover:bg-coral-50 text-slate-600 hover:text-coral-700 border border-slate-200 hover:border-coral-200/40 transition-all text-left truncate cursor-pointer shadow-sm"
                 title={sample.description}
               >
                 {sample.title.split(" - ")[0]}
@@ -181,35 +181,34 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
         </div>
       </div>
 
-      {/* Main Bento Form Grid */}
+      {/* Main Soft Form Grid */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {errorMessage && (
-          <div className="p-4 rounded-xl bg-red-950/80 border border-red-800/80 flex items-center gap-3 text-red-300 text-xs font-medium shadow-xl">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
+          <div className="p-4 rounded-2xl bg-coral-50 border border-coral-200 flex items-center gap-3 text-coral-800 text-xs font-medium soft-shadow">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-coral-600" />
             <span>{errorMessage}</span>
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Bento Card Left (7 cols): Document Upload / Paste Area */}
-          <div className="lg:col-span-7 bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center justify-between mb-5 border-b border-zinc-800/80 pb-4">
+          {/* Left Card: Document Upload / Paste Area */}
+          <div className="lg:col-span-7 bg-white border border-slate-200/80 rounded-3xl p-8 flex flex-col justify-between soft-shadow-lg page-fade">
+            <div className="flex items-center justify-between mb-6 border-b border-slate-200/80 pb-4">
               <div className="flex items-center gap-2">
-                <span className="bg-red-500 w-1.5 h-5 rounded-full"></span>
-                <h3 className="text-xs font-extrabold text-zinc-300 uppercase tracking-widest">
+                <span className="bg-coral-500 w-1.5 h-5 rounded-full"></span>
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">
                   CV Document Source
                 </h3>
               </div>
 
-              {/* Mode Toggle Tabs */}
-              <div className="flex p-1 bg-zinc-950 rounded-xl border border-zinc-800">
+              <div className="flex p-1 bg-slate-50 rounded-2xl border border-slate-200">
                 <button
                   type="button"
                   onClick={() => setActiveInputTab("upload")}
-                  className={`px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
                     activeInputTab === "upload"
-                      ? "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-md"
-                      : "text-zinc-400 hover:text-zinc-200"
+                      ? "bg-white border-coral-200 text-coral-700 shadow-sm"
+                      : "text-slate-400 hover:text-coral-600 hover:bg-coral-50"
                   }`}
                 >
                   Upload File
@@ -217,10 +216,10 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveInputTab("text")}
-                  className={`px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
                     activeInputTab === "text"
-                      ? "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-md"
-                      : "text-zinc-400 hover:text-zinc-200"
+                      ? "bg-white border-coral-200 text-coral-700 shadow-sm"
+                      : "text-slate-400 hover:text-coral-600 hover:bg-coral-50"
                   }`}
                 >
                   Paste Text
@@ -232,28 +231,28 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
             {activeInputTab === "upload" && (
               <div className="flex-1 flex flex-col justify-center py-2">
                 {fileData ? (
-                  <div className="p-6 rounded-xl border border-zinc-700/80 bg-zinc-950/80 flex flex-col items-center text-center shadow-lg">
-                    <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-red-500 mb-3 shadow-inner">
-                      <FileCheck className="w-7 h-7 text-red-400" />
+                  <div className="p-7 rounded-3xl border border-slate-200 bg-slate-50 flex flex-col items-center text-center soft-shadow">
+                    <div className="w-16 h-16 rounded-3xl bg-white border border-slate-200 flex items-center justify-center text-coral-500 mb-4 shadow-sm">
+                      <FileCheck className="w-8 h-8 text-coral-400" />
                     </div>
-                    <p className="text-sm font-bold text-zinc-100 mb-1 max-w-sm truncate">
+                    <p className="text-sm font-bold text-slate-900 mb-1 max-w-sm truncate">
                       {fileData.fileName}
                     </p>
-                    <p className="text-xs text-zinc-400 mb-4 font-mono">
+                    <p className="text-xs text-slate-400 mb-5 font-mono">
                       {fileData.sizeKb} KB • Siap untuk Analisis Multimodal HR
                     </p>
                     <div className="flex gap-2.5">
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 transition cursor-pointer"
+                        className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition cursor-pointer soft-btn"
                       >
                         Ganti File
                       </button>
                       <button
                         type="button"
                         onClick={() => setFileData(null)}
-                        className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-red-950/80 hover:bg-red-900 text-red-400 border border-red-800/80 transition flex items-center gap-1.5 cursor-pointer"
+                        className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-coral-50 hover:bg-coral-100 text-coral-700 border border-coral-200/80 transition flex items-center gap-1.5 cursor-pointer soft-btn"
                       >
                         <Trash2 className="w-3.5 h-3.5" /> Hapus
                       </button>
@@ -264,18 +263,18 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-zinc-800 hover:border-red-500/60 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 bg-zinc-950/40 hover:bg-zinc-950/70 flex flex-col items-center justify-center min-h-[260px] group"
+                    className="border-2 border-dashed border-slate-300 hover:border-coral-400/60 rounded-3xl p-10 text-center cursor-pointer transition-all duration-300 bg-slate-50/50 hover:bg-slate-100 flex flex-col items-center justify-center min-h-[280px] group soft-btn"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-zinc-900/90 border border-zinc-800 group-hover:border-red-500/50 flex items-center justify-center text-red-500 mb-3.5 transition-all shadow-inner group-hover:scale-105">
-                      <UploadCloud className="w-7 h-7 text-red-500 group-hover:text-red-400" />
+                    <div className="w-16 h-16 rounded-3xl bg-white/80 border border-slate-200 group-hover:border-coral-300/50 flex items-center justify-center text-coral-500 mb-4 transition-all shadow-sm group-hover:scale-105">
+                      <UploadCloud className="w-8 h-8 text-coral-500 group-hover:text-coral-400" />
                     </div>
-                    <p className="text-sm font-bold text-zinc-200 mb-1 group-hover:text-white">
+                    <p className="text-sm font-bold text-slate-800 mb-1 group-hover:text-slate-900">
                       Tarik &amp; Letakkan Dokumen CV (PDF / Gambar / TXT)
                     </p>
-                    <p className="text-xs text-zinc-400 max-w-xs mb-3.5">
+                    <p className="text-xs text-slate-400 max-w-xs mb-4">
                       Tata letak visual, formatting tabel &amp; kolom diuji otomatis oleh AI.
                     </p>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-zinc-900 text-zinc-400 border border-zinc-800 uppercase tracking-wider">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-white text-slate-400 border border-slate-200 uppercase tracking-wider">
                       Maksimal 15 MB
                     </span>
                   </div>
@@ -297,10 +296,10 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                   value={cvText}
                   onChange={(e) => setCvText(e.target.value)}
                   placeholder="Tempelkan seluruh isi teks CV Anda di sini (Ringkasan Profil, Pengalaman Kerja, Skill, Portofolio, Pendidikan)..."
-                  className="w-full h-64 p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 placeholder-zinc-600 text-xs sm:text-sm focus:outline-none focus:border-red-500 resize-y font-mono leading-relaxed shadow-inner"
+                  className="w-full h-64 p-4 rounded-3xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:border-coral-400 focus-ring-soft resize-y font-mono leading-relaxed shadow-inner"
                   id="cv-text-input"
                 />
-                <div className="flex items-center justify-between mt-2.5 text-[11px] text-zinc-400 font-mono">
+                <div className="flex items-center justify-between mt-2.5 text-[11px] text-slate-400 font-mono">
                   <span>
                     {cvText.trim().split(/\s+/).filter(Boolean).length} KATA • {cvText.length} KARAKTER
                   </span>
@@ -308,7 +307,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                     <button
                       type="button"
                       onClick={() => setCvText("")}
-                      className="text-red-400 hover:text-red-300 flex items-center gap-1 font-sans font-bold cursor-pointer"
+                      className="text-coral-600 hover:text-coral-700 flex items-center gap-1 font-sans font-bold cursor-pointer"
                     >
                       <Trash2 className="w-3 h-3" /> Bersihkan
                     </button>
@@ -318,27 +317,27 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
             )}
           </div>
 
-          {/* Bento Card Right (5 cols): Target Role & Configuration */}
-          <div className="lg:col-span-5 bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 shadow-2xl backdrop-blur-xl">
+          {/* Right Card: Target Role & Configuration */}
+          <div className="lg:col-span-5 bg-white border border-slate-200/80 rounded-3xl p-8 flex flex-col justify-between space-y-5 soft-shadow-lg page-fade">
             <div className="space-y-4">
-              <div className="flex items-center gap-2 border-b border-zinc-800/80 pb-4">
-                <span className="bg-red-500 w-1.5 h-5 rounded-full"></span>
-                <h3 className="text-xs font-extrabold text-zinc-300 uppercase tracking-widest">
+              <div className="flex items-center gap-2 border-b border-slate-200/80 pb-4">
+                <span className="bg-coral-500 w-1.5 h-5 rounded-full"></span>
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">
                   Target Role &amp; Parameters
                 </h3>
               </div>
 
               {/* Target Role */}
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5 text-red-400" /> Posisi / Job Target
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-coral-400" /> Posisi / Job Target
                 </label>
                 <input
                   type="text"
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                   placeholder="Contoh: Senior Software Engineer"
-                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs sm:text-sm focus:outline-none focus:border-red-500 font-medium shadow-inner"
+                  className="w-full px-4 py-2.5 rounded-3xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:border-coral-400 focus-ring-soft font-medium shadow-inner"
                   id="target-role-input"
                 />
                 <div className="flex flex-wrap gap-1.5 mt-2.5">
@@ -347,7 +346,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                       key={r}
                       type="button"
                       onClick={() => setTargetRole(r)}
-                      className="text-[10px] px-2.5 py-1 rounded-lg bg-zinc-950 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 border border-zinc-800 transition font-medium cursor-pointer"
+                      className="text-[10px] px-2.5 py-1 rounded-xl bg-slate-50 text-slate-400 hover:text-coral-700 hover:border-slate-300 border border-slate-200 transition font-medium cursor-pointer soft-btn"
                     >
                       {r}
                     </button>
@@ -358,13 +357,13 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
               {/* Level & Language */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center gap-1.5">
-                    <Layers className="w-3.5 h-3.5 text-zinc-500" /> Senioritas
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-slate-400" /> Senioritas
                   </label>
                   <select
                     value={targetLevel}
                     onChange={(e) => setTargetLevel(e.target.value as TargetLevel)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs focus:outline-none focus:border-red-500 cursor-pointer"
+                    className="w-full px-3 py-2.5 rounded-3xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-coral-400 focus-ring-soft cursor-pointer"
                   >
                     <option value="freshgrad">Fresh Grad (0-1 thn)</option>
                     <option value="junior">Junior (1-2 thn)</option>
@@ -376,13 +375,13 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center gap-1.5">
-                    <Languages className="w-3.5 h-3.5 text-zinc-500" /> Bahasa Review
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                    <Languages className="w-3.5 h-3.5 text-slate-400" /> Bahasa Review
                   </label>
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value as "id" | "en")}
-                    className="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs focus:outline-none focus:border-red-500 cursor-pointer"
+                    className="w-full px-3 py-2.5 rounded-3xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-coral-400 focus-ring-soft cursor-pointer"
                   >
                     <option value="id">Bahasa Indonesia (Pedas)</option>
                     <option value="en">English (Brutal)</option>
@@ -391,30 +390,30 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
               </div>
 
               {/* Optional Job Description Matcher */}
-              <div className="pt-2 border-t border-zinc-800/60">
+              <div className="pt-2 border-t border-slate-200/60">
                 <button
                   type="button"
                   onClick={() => setShowJdInput(!showJdInput)}
-                  className="text-[11px] font-bold text-zinc-300 hover:text-red-400 flex items-center justify-between w-full py-1 cursor-pointer transition"
+                  className="text-[11px] font-bold text-slate-400 hover:text-coral-600 flex items-center justify-between w-full py-1 cursor-pointer transition soft-btn"
                 >
                   <span className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-coral-400" />
                     Target Job Description / Persyaratan Lowongan (Opsional)
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-slate-200 text-slate-500 font-mono">
                     {showJdInput ? "Tutup" : "+ Tambah JD"}
                   </span>
                 </button>
 
                 {showJdInput && (
-                  <div className="mt-2.5 animate-fadeIn">
+                  <div className="mt-2.5 animate-[fadeIn_0.3s_ease-out]">
                     <textarea
                       value={jobDescription}
                       onChange={(e) => setJobDescription(e.target.value)}
                       placeholder="Tempelkan kualifikasi / requirements dari iklan lowongan kerja di sini untuk audit kecocokan ATS 100% presisi..."
-                      className="w-full h-24 p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-200 placeholder-zinc-600 text-xs focus:outline-none focus:border-red-500 font-mono resize-y shadow-inner"
+                      className="w-full h-24 p-3 rounded-3xl bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 text-xs focus:outline-none focus:border-coral-400 focus-ring-soft font-mono resize-y shadow-inner"
                     />
-                    <p className="text-[10px] text-zinc-400 mt-1">
+                    <p className="text-[10px] text-slate-400 mt-1">
                       AI akan mencocokkan kata kunci ATS & gap kompetensi secara presisi terhadap lowongan ini.
                     </p>
                   </div>
@@ -423,81 +422,81 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
 
               {/* Strictness Persona Grid */}
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-red-500" /> Persona Evaluasi HR
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+                  <Flame className="w-3.5 h-3.5 text-coral-500" /> Persona Evaluasi HR
                 </label>
                 <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"
                     onClick={() => setStrictnessMode("savage_brutal")}
-                    className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                    className={`p-3 rounded-3xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
                       strictnessMode === "savage_brutal"
-                        ? "bg-red-950/70 border-red-500 text-white shadow-md shadow-red-950/40"
-                        : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
+                        ? "bg-coral-50 border-coral-200 text-coral-900 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300"
+                    } soft-btn`}
                   >
                     <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-xs font-bold text-red-400">🔥 Savage Roast</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-red-900 text-red-200 font-bold uppercase">Brutal</span>
+                      <span className="text-xs font-bold text-coral-600">🔥 Savage Roast</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-coral-100 text-coral-700 font-bold uppercase">Brutal</span>
                     </div>
-                    <span className="text-[10px] text-zinc-400">Kritik pedas &amp; reality check.</span>
+                    <span className="text-[10px] text-slate-400">Kritik pedas &amp; reality check.</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setStrictnessMode("stern_hr")}
-                    className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                    className={`p-3 rounded-3xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
                       strictnessMode === "stern_hr"
-                        ? "bg-red-950/70 border-red-500 text-white shadow-md shadow-red-950/40"
-                        : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
+                        ? "bg-coral-50 border-coral-200 text-coral-900 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300"
+                    } soft-btn`}
                   >
                     <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-xs font-bold text-zinc-200">👔 Stern Exec</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 font-bold uppercase">BANGKAH</span>
+                      <span className="text-xs font-bold text-slate-700">👔 Stern Exec</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-bold uppercase">BANGKAH</span>
                     </div>
-                    <span className="text-[10px] text-zinc-400">Formal &amp; data-driven criteria.</span>
+                    <span className="text-[10px] text-slate-400">Formal &amp; data-driven criteria.</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setStrictnessMode("ats_robot")}
-                    className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                    className={`p-3 rounded-3xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
                       strictnessMode === "ats_robot"
-                        ? "bg-red-950/70 border-red-500 text-white shadow-md shadow-red-950/40"
-                        : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
+                        ? "bg-coral-50 border-coral-200 text-coral-900 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300"
+                    } soft-btn`}
                   >
                     <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-xs font-bold text-zinc-200">🤖 ATS Robot</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 font-bold uppercase">Parser</span>
+                      <span className="text-xs font-bold text-slate-700">🤖 ATS Robot</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-bold uppercase">Parser</span>
                     </div>
-                    <span className="text-[10px] text-zinc-400">Audit keyword &amp; formatting.</span>
+                    <span className="text-[10px] text-slate-400">Audit keyword &amp; formatting.</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setStrictnessMode("constructive_pro")}
-                    className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                    className={`p-3 rounded-3xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
                       strictnessMode === "constructive_pro"
-                        ? "bg-red-950/70 border-red-500 text-white shadow-md shadow-red-950/40"
-                        : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
+                        ? "bg-coral-50 border-coral-200 text-coral-900 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300"
+                    } soft-btn`}
                   >
                     <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-xs font-bold text-zinc-200">💼 Pro Coach</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 font-bold uppercase">Solutif</span>
+                      <span className="text-xs font-bold text-slate-700">💼 Pro Coach</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-bold uppercase">Solutif</span>
                     </div>
-                    <span className="text-[10px] text-zinc-400">Tegas dengan solusi instan.</span>
+                    <span className="text-[10px] text-slate-400">Tegas dengan solusi instan.</span>
                   </button>
                 </div>
               </div>
 
               {/* Accuracy Guarantee Badge */}
-              <div className="p-3 rounded-xl bg-zinc-950/90 border border-zinc-800 flex items-center gap-2.5 text-zinc-400 text-[11px]">
-                <FileCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <div className="p-4 rounded-3xl bg-coral-50 border border-coral-200 flex items-center gap-2.5 text-slate-600 text-[11px]">
+                <FileCheck className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                 <span>
-                  <strong className="text-zinc-200">Zero-Hallucination Grounding:</strong> Setiap kritik &amp; audit mengutip kalimat asli dari CV Anda secara objektif.
+                  <strong className="text-slate-800">Zero-Hallucination Grounding:</strong> Setiap kritik &amp; audit mengutip kalimat asli dari CV Anda secara objektif.
                 </span>
               </div>
             </div>
@@ -506,7 +505,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-red-950/60 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01]"
+              className="w-full py-5 px-8 rounded-3xl bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-coral-200/60 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.01] soft-btn"
               id="submit-cv-review-btn"
             >
               {isLoading ? (
@@ -527,5 +526,4 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
     </div>
   );
 };
-
 
