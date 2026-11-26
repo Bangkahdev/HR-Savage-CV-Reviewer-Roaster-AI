@@ -1,28 +1,132 @@
 import express from "express";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
+import { z, ZodError } from "zod";
 
 dotenv.config();
 
 const app = express();
 
-// Middleware for large payload (e.g. base64 PDFs or images)
+// =========================================================================
+// MIDDLEWARE
+// =========================================================================
+
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
+
+// CORS — restrict in production via env
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
+    : ["http://localhost:3000", "https://localhost:3000"],
+  credentials: true,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+
+// Global rate limiter — 100 requests per 15 minutes per IP
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, error: "Terlalu banyak permintaan. Silakan coba lagi nanti." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api/", globalLimiter);
+
+// Stricter limiter for AI endpoints — 20 requests per 15 minutes per IP
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { success: false, error: "Kuota AI terkena batas. Silakan tunggu beberapa saat sebelum mencoba lagi." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// =========================================================================
+// GEMINI CLIENT
+// =========================================================================
 
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY belum dikonfigurasi di Environment Variables Vercel atau file .env.");
+    throw new Error("GEMINI_API_KEY belum dikonfigurasi di Environment Variables.");
   }
   return new GoogleGenAI({
     apiKey,
     httpOptions: {
       headers: {
-        "User-Agent": "aistudio-build",
+        "User-Agent": "hr-savage-cv-roaster-ai/2.0.0",
       },
     },
   });
+}
+
+/**
+ * Candidate models — only real, stable Gemini models.
+ * Order: preferred first, fallback on 429/5xx.
+ */
+const CANDIDATE_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash-latest",
+  "gemini-1.5-pro-latest",
+];
+
+/**
+ * Fast & robust execution helper with rapid fallback across reliable models.
+ */
+async function generateWithRetry(ai: GoogleGenAI, options: any) {
+  let lastError: any = null;
+
+  for (const model of CANDIDATE_MODELS) {
+    try {
+      return await ai.models.generateContent({
+        model,
+        ...options,
+      });
+    } catch (err: any) {
+      lastError = err;
+      const errMsg = err?.message || JSON.stringify(err);
+      console.warn(`[Gemini API] Model ${model} encountered issue: ${errMsg}. Trying next candidate model...`);
+
+      if (
+        errMsg.includes("API key not valid") ||
+        errMsg.includes("API_KEY_INVALID") ||
+        errMsg.includes("GEMINI_API_KEY")
+      ) {
+        throw new Error(
+          "GEMINI_API_KEY tidak valid atau belum dikonfigurasi. Periksa Vercel Project Settings > Environment Variables."
+        );
+      }
+
+      if (errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("429") || errMsg.includes("Quota exceeded")) {
+        continue; // try next model
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
+  throw lastError;
+}
+
+function formatErrorMessage(error: any): string {
+  const msg = error?.message || error?.toString() || "Unknown error";
+  if (
+    msg.includes("API_KEY_INVALID") ||
+    msg.includes("API key not valid") ||
+    msg.includes("GEMINI_API_KEY")
+  ) {
+    return "GEMINI_API_KEY tidak valid atau belum dikonfigurasi. Atur di dashboard Vercel > Environment Variables.";
+  }
+  if (msg.includes("RESOURCE_EXHAUSTED") || msg.includes("429") || msg.includes("Quota exceeded")) {
+    return "Kuota API Gemini telah tercapai. Silakan coba lagi dalam beberapa saat.";
+  }
+  return msg;
 }
 
 function cleanJsonString(raw: string): string {
@@ -35,51 +139,95 @@ function cleanJsonString(raw: string): string {
   return cleaned.trim();
 }
 
-/**
- * Fast & robust execution helper with rapid fallback across reliable models
- */
-async function generateWithRetry(ai: GoogleGenAI, options: any) {
-  const candidateModels = ["gemini-3.7-flash", "gemini-flash-latest", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite"];
-  let lastError: any = null;
+// =========================================================================
+// ZOD VALIDATION SCHEMAS
+// =========================================================================
 
-  for (const model of candidateModels) {
-    try {
-      return await ai.models.generateContent({
-        model,
-        ...options,
-      });
-    } catch (err: any) {
-      lastError = err;
-      const errMsg = err?.message || JSON.stringify(err);
-      console.warn(`[Gemini API] Model ${model} encountered issue: ${errMsg}. Trying next candidate model...`);
+const ReviewCVRequestSchema = z.object({
+  cvText: z.string().optional(),
+  fileData: z
+    .object({
+      mimeType: z.string(),
+      data: z.string(),
+      fileName: z.string().optional(),
+    })
+    .optional(),
+  targetRole: z.string().default("Software Engineer"),
+  targetLevel: z
+    .enum(["freshgrad", "junior", "mid", "senior", "lead", "executive"])
+    .default("mid"),
+  industry: z.string().default("Technology"),
+  jobDescription: z.string().optional(),
+  strictnessMode: z
+    .enum(["savage_brutal", "stern_hr", "constructive_pro", "ats_robot"])
+    .default("savage_brutal"),
+  language: z.enum(["id", "en"]).default("id"),
+});
 
-      if (errMsg.includes("API key not valid") || errMsg.includes("API_KEY_INVALID") || errMsg.includes("GEMINI_API_KEY")) {
-        throw new Error("GEMINI_API_KEY tidak valid atau belum dikonfigurasi di Environment Variables Vercel. Silakan periksa Vercel Project Settings > Environment Variables.");
-      }
+const DigitalFootprintRequestSchema = z.object({
+  candidateName: z.string().default("Kandidat"),
+  name: z.string().optional(),
+  targetRole: z.string().default("Professional"),
+  cvText: z.string().optional(),
+  linkedinUrlOrBio: z.string().default(""),
+  twitterUrlOrBio: z.string().default(""),
+  githubUrlOrBio: z.string().default(""),
+  portfolioOrBlog: z.string().default(""),
+  additionalNotes: z.string().default(""),
+  language: z.enum(["id", "en"]).default("id"),
+});
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
-  }
+const GitHubRoastRequestSchema = z.object({
+  username: z.string().default("developer"),
+  targetRole: z.string().optional(),
+  claimedTechStack: z.string().optional(),
+  manualRepoInfo: z.string().optional(),
+  language: z.enum(["id", "en"]).default("id"),
+});
 
-  throw lastError;
+const HRChatRequestSchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        sender: z.enum(["user", "hr"]),
+        text: z.string(),
+      })
+    )
+    .default([]),
+  cvContext: z.any().optional(),
+  targetRole: z.string().default("Software Engineer"),
+});
+
+const RewriteBulletRequestSchema = z.object({
+  bulletText: z.string().min(1, "Kalimat tidak boleh kosong."),
+  role: z.string().default("Software Engineer"),
+  metricHint: z.string().optional(),
+});
+
+const QuickRoastRequestSchema = z.object({
+  snippet: z.string().min(1, "Snippet tidak boleh kosong."),
+  role: z.string().optional(),
+  language: z.enum(["id", "en"]).default("id"),
+});
+
+// =========================================================================
+// TYPE DEFINITIONS FOR GEMINI RESPONSES
+// =========================================================================
+
+interface GeminiTextResponse {
+  text: string | null;
 }
 
-function formatErrorMessage(error: any): string {
-  const msg = error?.message || error?.toString() || "Unknown error";
-  if (msg.includes("API_KEY_INVALID") || msg.includes("API key not valid") || msg.includes("GEMINI_API_KEY")) {
-    return "GEMINI_API_KEY tidak valid atau belum dikonfigurasi di Environment Variables Vercel. Silakan atur GEMINI_API_KEY di dashboard Vercel.";
-  }
-  if (msg.includes("RESOURCE_EXHAUSTED") || msg.includes("429") || msg.includes("Quota exceeded")) {
-    return "Limit kuota API Gemini telah tercapai untuk saat ini. Silakan coba lagi dalam beberapa saat.";
-  }
-  return msg;
-}
+// =========================================================================
+// HEALTH CHECK
+// =========================================================================
 
-// Health check endpoint
-app.get("/api/health", (req, res) => {
+app.get("/api/health", (_req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.json({
     status: "ok",
+    service: "HR Savage CV Reviewer & Roaster AI",
+    version: "2.0.0",
     hasApiKey: !!process.env.GEMINI_API_KEY,
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV || "development",
@@ -89,9 +237,11 @@ app.get("/api/health", (req, res) => {
 // =========================================================================
 // 1. FULL CV REVIEW & ROASTING ENDPOINT (/api/review-cv)
 // =========================================================================
-app.post("/api/review-cv", async (req, res) => {
+
+app.post("/api/review-cv", aiLimiter, async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
+    const parsed = ReviewCVRequestSchema.parse(req.body);
     const {
       cvText = "",
       fileData,
@@ -101,9 +251,9 @@ app.post("/api/review-cv", async (req, res) => {
       jobDescription = "",
       strictnessMode = "savage_brutal",
       language = "id",
-    } = req.body;
+    } = parsed;
 
-    if (!cvText && !fileData?.data) {
+    if (!cvText.trim() && !fileData?.data) {
       return res.status(400).json({
         success: false,
         error: "Harap masukkan teks CV atau unggah dokumen CV/Resume Anda.",
@@ -126,63 +276,24 @@ PENTING:
 KEMBALIKAN HANYA JSON VALID DENGAN STRUKTUR BERIKUT:
 {
   "overallScore": <angka bulat 0-100>,
-  "grade": "<S / A / B / C / D / F>",
+  "grade": "<S / A / B / C / D / F>,
   "verdictTag": "<Tag vonis singkat misal: REJECTED IN 6 SECONDS / BUZZWORD OVERDOSE / POTENTIAL HIKIKOMORI / INTERVIEW WORTHY>",
   "summaryRoast": "<Paragraf pembuka roasting pedas atau ringkasan evaluasi tajam 2-3 kalimat>",
   "scoreBreakdown": {
-    "impactAndMetrics": {
-      "score": <angka 0-20>,
-      "max": 20,
-      "feedback": "<Kritik penggunaan angka, metrik finansial, formula X-Y-Z>",
-      "status": "<critical / warning / good>"
-    },
-    "atsCompatibility": {
-      "score": <angka 0-20>,
-      "max": 20,
-      "feedback": "<Kritik parsing ATS, layout kolom, font, tabel>",
-      "status": "<critical / warning / good>"
-    },
-    "actionVerbsAndClarity": {
-      "score": <angka 0-20>,
-      "max": 20,
-      "feedback": "<Kritik kata kerja aktif vs pasif>",
-      "status": "<critical / warning / good>"
-    },
-    "skillsAndKeywords": {
-      "score": <angka 0-20>,
-      "max": 20,
-      "feedback": "<Kritik relevansi tech stack / kata kunci>",
-      "status": "<critical / warning / good>"
-    },
-    "careerStoryAndRelevance": {
-      "score": <angka 0-20>,
-      "max": 20,
-      "feedback": "<Kritik alur karir dan relevansi dengan target role>",
-      "status": "<critical / warning / good>"
-    }
+    "impactAndMetrics": { "score": <angka 0-20>, "max": 20, "feedback": "<Kritik penggunaan angka, metrik finansial, formula X-Y-Z>", "status": "<critical / warning / good>" },
+    "atsCompatibility": { "score": <angka 0-20>, "max": 20, "feedback": "<Kritik parsing ATS, layout kolom, font, tabel>", "status": "<critical / warning / good>" },
+    "actionVerbsAndClarity": { "score": <angka 0-20>, "max": 20, "feedback": "<Kritik kata kerja aktif vs pasif>", "status": "<critical / warning / good>" },
+    "skillsAndKeywords": { "score": <angka 0-20>, "max": 20, "feedback": "<Kritik relevansi tech stack / kata kunci>", "status": "<critical / warning / good>" },
+    "careerStoryAndRelevance": { "score": <angka 0-20>, "max": 20, "feedback": "<Kritik alur karir dan relevansi dengan target role>", "status": "<critical / warning / good>" }
   },
   "fatalRedFlags": [
-    {
-      "title": "<Nama Red Flag>",
-      "explanation": "<Penjelasan mengapa ini membunuh peluang CV>",
-      "severity": "<high / medium / low>",
-      "fix": "<Solusi konkret revisi>"
-    }
+    { "title": "<Nama Red Flag>", "explanation": "<Penjelasan mengapa ini membunuh peluang CV>", "severity": "<high / medium / low>", "fix": "<Solusi konkret revisi>" }
   ],
   "buzzwordAudit": [
-    {
-      "word": "<Kata klise/buzzword di CV, misal: 'Hardworking', 'Passionate', 'Fast learner'>",
-      "whyItSucks": "<Alasan mengapa recruiter muak membaca kata ini>",
-      "replacement": "<Bukti konkret yang harus ditampilkan sebagai gantinya>"
-    }
+    { "word": "<Kata klise/buzzword di CV>", "whyItSucks": "<Alasan mengapa recruiter muak membaca kata ini>", "replacement": "<Bukti konkret yang harus ditampilkan sebagai gantinya>" }
   ],
   "bulletPointRewrites": [
-    {
-      "original": "<Kutipan kalimat asli di CV yang lemah>",
-      "whyWeak": "<Mengapa kalimat ini gagal menunjukkan dampak>",
-      "improvedSTAR": "<Versi perbaikan berstandar BANGKAH Google X-Y-Z>",
-      "impactExplained": "<Dampak bisnis yang terpancar setelah direvisi>"
-    }
+    { "original": "<Kutipan kalimat asli di CV yang lemah>", "whyWeak": "<Mengapa kalimat ini gagal menunjukkan dampak>", "improvedSTAR": "<Versi perbaikan berstandar BANGKAH Google X-Y-Z>", "impactExplained": "<Dampak bisnis yang terpancar setelah direvisi>" }
   ],
   "atsSimulation": {
     "parseScore": <angka 0-100>,
@@ -191,51 +302,16 @@ KEMBALIKAN HANYA JSON VALID DENGAN STRUKTUR BERIKUT:
     "formattingRisks": ["<resiko format 1>", "<resiko 2>"]
   },
   "sectionBySectionCritique": {
-    "headerAndSummary": {
-      "roast": "<Kritik bagian profil/summary>",
-      "recommendation": "<Saran perbaikan>",
-      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
-    },
-    "workExperience": {
-      "roast": "<Kritik bagian pengalaman kerja>",
-      "recommendation": "<Saran perbaikan>",
-      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
-    },
-    "skillsAndTools": {
-      "roast": "<Kritik daftar skills>",
-      "recommendation": "<Saran perbaikan>",
-      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
-    },
-    "educationAndCertifications": {
-      "roast": "<Kritik edukasi & sertifikasi>",
-      "recommendation": "<Saran perbaikan>",
-      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
-    },
-    "layoutAndLength": {
-      "roast": "<Kritik panjang halaman & kerapihan visual>",
-      "recommendation": "<Saran perbaikan>",
-      "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>"
-    }
+    "headerAndSummary": { "roast": "<Kritik bagian profil/summary>", "recommendation": "<Saran perbaikan>", "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>" },
+    "workExperience": { "roast": "<Kritik bagian pengalaman kerja>", "recommendation": "<Saran perbaikan>", "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>" },
+    "skillsAndTools": { "roast": "<Kritik daftar skills>", "recommendation": "<Saran perbaikan>", "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>" },
+    "educationAndCertifications": { "roast": "<Kritik edukasi & sertifikasi>", "recommendation": "<Saran perbaikan>", "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>" },
+    "layoutAndLength": { "roast": "<Kritik panjang halaman & kerapihan visual>", "recommendation": "<Saran perbaikan>", "rating": "<Sangat Buruk / Perlu Dirombak / Cukup / Bagus>" }
   },
   "stepByStepActionPlan": [
-    {
-      "step": 1,
-      "priority": "<Darurat (Segera) / Penting / Penyempurnaan>",
-      "action": "<Langkah spesifik 1>",
-      "example": "<Contoh penerapannya>"
-    },
-    {
-      "step": 2,
-      "priority": "<Darurat (Segera) / Penting / Penyempurnaan>",
-      "action": "<Langkah spesifik 2>",
-      "example": "<Contoh penerapannya>"
-    },
-    {
-      "step": 3,
-      "priority": "<Darurat (Segera) / Penting / Penyempurnaan>",
-      "action": "<Langkah spesifik 3>",
-      "example": "<Contoh penerapannya>"
-    }
+    { "step": 1, "priority": "<Darurat (Segera) / Penting / Penyempurnaan>", "action": "<Langkah spesifik 1>", "example": "<Contoh penerapannya>" },
+    { "step": 2, "priority": "<Darurat (Segera) / Penting / Penyempurnaan>", "action": "<Langkah spesifik 2>", "example": "<Contoh penerapannya>" },
+    { "step": 3, "priority": "<Darurat (Segera) / Penting / Penyempurnaan>", "action": "<Langkah spesifik 3>", "example": "<Contoh penerapannya>" }
   ],
   "sampleFullCvRewriteSnippet": "<Contoh cuplikan teks pengalaman kerja yang sudah disempurnakan>"
 }
@@ -273,7 +349,7 @@ KEMBALIKAN HANYA JSON VALID DENGAN STRUKTUR BERIKUT:
       },
     });
 
-    const rawResponseText = response.text || "{}";
+    const rawResponseText = (response as GeminiTextResponse).text || "{}";
     const cleanedJson = cleanJsonString(rawResponseText);
     const parsedData = JSON.parse(cleanedJson);
 
@@ -282,6 +358,12 @@ KEMBALIKAN HANYA JSON VALID DENGAN STRUKTUR BERIKUT:
       data: parsedData,
     });
   } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+      });
+    }
     console.error("CV Review Error:", error);
     res.status(500).json({
       success: false,
@@ -291,9 +373,10 @@ KEMBALIKAN HANYA JSON VALID DENGAN STRUKTUR BERIKUT:
 });
 
 // =========================================================================
-// 2. DIGITAL FOOTPRINT AUDIT ENDPOINT (/api/audit-digital-footprint)
+// 2. DIGITAL FOOTPRINT AUDIT ENDPOINT (/api/digital-footprint)
 // =========================================================================
-app.post("/api/audit-digital-footprint", async (req, res) => {
+
+app.post("/api/audit-digital-footprint", aiLimiter, async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
     const {
@@ -307,7 +390,7 @@ app.post("/api/audit-digital-footprint", async (req, res) => {
       portfolioOrBlog = "",
       additionalNotes = "",
       language = "id",
-    } = req.body;
+    } = DigitalFootprintRequestSchema.parse(req.body);
 
     const resolvedName = candidateName || name || "Kandidat";
 
@@ -377,28 +460,35 @@ Keluarkan HANYA JSON valid.
       },
     });
 
-    const cleanedText = cleanJsonString(response.text || "{}");
+    const cleanedText = cleanJsonString((response as GeminiTextResponse).text || "{}");
     const parsed = JSON.parse(cleanedText);
     res.json({ success: true, data: parsed });
   } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+      });
+    }
     console.error("Digital Footprint Error:", error);
     res.status(500).json({ success: false, error: formatErrorMessage(error) });
   }
 });
 
-// =========================================
+// =========================================================================
 // 3. GITHUB ROASTER & FULL PROFILE SCANNER (/api/roast-github)
-// =========================================
-app.post("/api/roast-github", async (req, res) => {
+// =========================================================================
+
+app.post("/api/roast-github", aiLimiter, async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
     let {
       username = "developer",
-      targetRole = "Software Engineer",
-      claimedTechStack = "",
-      manualRepoInfo = "",
+      targetRole,
+      claimedTechStack,
+      manualRepoInfo,
       language = "id",
-    } = req.body;
+    } = GitHubRoastRequestSchema.parse(req.body);
 
     // Clean username if passed as a full URL or with @
     username = username
@@ -417,12 +507,12 @@ app.post("/api/roast-github", async (req, res) => {
     if (username) {
       try {
         const headers: Record<string, string> = {
-          "User-Agent": "HR-Savage-CV-Reviewer-AI",
+          "User-Agent": "HR-Savage-CV-Reviewer-AI/2.0.0",
           "Accept": "application/vnd.github.v3+json",
         };
 
         const userRes = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, { headers });
-        
+
         if (userRes.status === 404) {
           return res.status(404).json({
             success: false,
@@ -432,22 +522,19 @@ app.post("/api/roast-github", async (req, res) => {
 
         if (userRes.ok) {
           const userData = await userRes.json();
-          
-          // Fetch up to 100 repos sorted by recently pushed
+
           const reposRes = await fetch(
             `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=pushed&per_page=100`,
             { headers }
           );
           const reposData = reposRes.ok ? await reposRes.json() : [];
 
-          // Fetch public events (up to 100)
           const eventsRes = await fetch(
             `https://api.github.com/users/${encodeURIComponent(username)}/events/public?per_page=100`,
             { headers }
           );
           const eventsData = eventsRes.ok ? await eventsRes.json() : [];
 
-          // Fetch starred repos count (checking user starred list)
           let starredReposCount = 0;
           try {
             const starredRes = await fetch(
@@ -462,16 +549,13 @@ app.post("/api/roast-github", async (req, res) => {
             // Ignore if starred fetch fails
           }
 
-          // Fetch gists count
           let publicGistsCount = userData.public_gists || 0;
 
-          // Extract granular activity stats
           const realCommitMessages: string[] = [];
           const prActionDetails: Array<{ repo: string; action: string; title: string; merged: boolean }> = [];
           const issueActionDetails: Array<{ repo: string; action: string; title: string }> = [];
           const watchStarActions: Array<{ repo: string; date: string }> = [];
           const forkActions: Array<{ repo: string; forkedTo: string }> = [];
-          const issueCommentsCount: number[] = [];
 
           let pushEventsCount = 0;
           let prEventsCount = 0;
@@ -550,13 +634,16 @@ app.post("/api/roast-github", async (req, res) => {
                 createEventsCount++;
               } else if (ev.type === "ReleaseEvent") {
                 releaseEventsCount++;
-              } else if (ev.type === "IssueCommentEvent" || ev.type === "CommitCommentEvent" || ev.type === "PullRequestReviewCommentEvent") {
+              } else if (
+                ev.type === "IssueCommentEvent" ||
+                ev.type === "CommitCommentEvent" ||
+                ev.type === "PullRequestReviewCommentEvent"
+              ) {
                 commentEventsCount++;
               }
             }
           }
 
-          // Evaluate Commit Hygiene Statistics
           let structuredCommitCount = 0;
           let lazyCommitCount = 0;
           const semanticPrefixRegex = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?:\s?.+/i;
@@ -571,7 +658,6 @@ app.post("/api/roast-github", async (req, res) => {
             }
           }
 
-          // Compute comprehensive factual statistics
           let totalStars = 0;
           let totalForks = 0;
           let originalStars = 0;
@@ -638,22 +724,29 @@ app.post("/api/roast-github", async (req, res) => {
             .sort((a, b) => b[1] - a[1])
             .map(([lang, count]) => `${lang} (${count} repo)`);
 
-          // Calculate account age
           const createdDate = new Date(userData.created_at);
           const now = new Date();
           const diffMs = now.getTime() - createdDate.getTime();
           const diffYears = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 365.25));
-          const diffMonths = Math.floor((diffMs % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24 * 30.44));
+          const diffMonths = Math.floor(
+            (diffMs % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24 * 30.44)
+          );
           const accountAgeFormatted = diffYears > 0 ? `${diffYears} tahun ${diffMonths} bulan` : `${diffMonths} bulan`;
 
-          // Check most recent push
           let latestPushDateFormatted = "Belum terdeteksi aktivitas push";
           if (mappedRepos.length > 0) {
-            const sortedByPush = [...mappedRepos].sort((a, b) => new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime());
+            const sortedByPush = [...mappedRepos].sort(
+              (a, b) => new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime()
+            );
             if (sortedByPush[0]?.pushed_at) {
               const lastPushDate = new Date(sortedByPush[0].pushed_at);
               const daysAgo = Math.floor((now.getTime() - lastPushDate.getTime()) / (1000 * 60 * 60 * 24));
-              latestPushDateFormatted = daysAgo === 0 ? "Hari ini" : daysAgo < 30 ? `${daysAgo} hari yang lalu` : `${Math.floor(daysAgo / 30)} bulan yang lalu`;
+              latestPushDateFormatted =
+                daysAgo === 0
+                  ? "Hari ini"
+                  : daysAgo < 30
+                    ? `${daysAgo} hari yang lalu`
+                    : `${Math.floor(daysAgo / 30)} bulan yang lalu`;
             }
           }
 
@@ -721,14 +814,18 @@ app.post("/api/roast-github", async (req, res) => {
     const cleanedTargetRole = targetRole?.trim() || "";
     const isTargetRoleCustom = Boolean(
       cleanedTargetRole &&
-      !["software engineer", "fullstack developer / software engineer", "general developer"].includes(cleanedTargetRole.toLowerCase())
+        ![
+          "software engineer",
+          "fullstack developer / software engineer",
+          "general developer",
+        ].includes(cleanedTargetRole.toLowerCase())
     );
     const hasClaimedStack = Boolean(claimedTechStack && claimedTechStack.trim());
     const hasManualRepo = Boolean(manualRepoInfo && manualRepoInfo.trim());
     const isTargetedMode = isTargetRoleCustom || hasClaimedStack || hasManualRepo;
 
-    const evaluatedTargetRole = isTargetedMode 
-      ? (cleanedTargetRole || "Spesialisasi Sesuai Klaim CV") 
+    const evaluatedTargetRole = isTargetedMode
+      ? cleanedTargetRole || "Spesialisasi Sesuai Klaim CV"
       : "Audit Umum Seluruh Profil & Kemampuan Developer";
 
     const ai = getGeminiClient();
@@ -739,15 +836,15 @@ Karaktermu: Sangat analitis, akurat 100% berbasis data faktual, berwawasan menda
 
 STATUS MODE AUDIT: ${
   isTargetedMode
-    ? `[MODE TARGETED ROLE & CV CROSS-CHECK AUDIT]`
-    : `[MODE AUDIT MENYELURUH & PROFIL HOLISTIK]`
+    ? "[MODE TARGETED ROLE & CV CROSS-CHECK AUDIT]"
+    : "[MODE AUDIT MENYELURUH & PROFIL HOLISTIK]"
 }
 
 ===================================================================
 PANDUAN UTAMA AKURASI & KALIBRASI LEVEL DEVELOPER (STRICT ACCURACY RUBRIC):
 ===================================================================
 1. KALIBRASI NILAI (devScore) & TIER (devTier) SECARA REALISTIS:
-   - 90 - 100 ("Production Hardened Chad / Open-Source Legend"): Memiliki ratusan/ribuan bintang asli, membuat framework/library orisinal berdampak tinggi, arsitektur kelas dunia (misal: Linus Torvalds, creator open-source terkenal). JANGAN PERNAH merendahkan developer kaliber ini sebagai "tutorial hell".
+   - 90 - 100 ("Production Hardened Chad / Open-Source Legend"): Memiliki ratusan/ribuan bintang asli, membuat framework/library orisinal berdampak tinggi, arsitektur kelas dunia. JANGAN PERNAH merendahkan developer kaliber ini sebagai "tutorial hell".
    - 75 - 89 ("Senior / Lead Architect Material"): Portofolio proyek orisinal production-grade lengkap dengan live demo website/app, testing, CI/CD, dokumentasi rapi, lisensi open-source, dan kebiasaan commit semantic yang konsisten.
    - 60 - 74 ("Solid Mid-Level Engineer"): Memiliki beberapa repositori orisinal yang selesai dan berfungsi, tech stack modern yang koheren, dokumentasi lumayan, commit aktif.
    - 40 - 59 ("Junior CRUD Specialist / Builder"): Repositori masih seputar project dasar, minim unit test, belum banyak live demo, pesan commit masih sering acak ("update", "fix").
@@ -774,7 +871,7 @@ KEMBALIKAN HANYA JSON VALID SESUAI SKEMA BERIKUT:
   "detectedDeveloperRole": "<Peran/Spesialisasi yang kamu deteksi secara akurat dari komposisi kode>",
   "targetRoleEvaluated": "${evaluatedTargetRole}",
   "realNameOrBio": "<Nama asli atau bio nyata dari GitHub>",
-  "avatarUrl": "${fetchedGithubData?.avatar_url || `https://github.com/${username}.png`}",
+  "avatarUrl": "${fetchedGithubData?.avatar_url || \`https://github.com/\${username}.png\`}",
   "devScore": <angka 0-100 terkalibrasi secara objektif>,
   "devTier": "<Production Hardened Chad / Senior Architect / Solid Mid-Level / Junior CRUD Specialist / Tutorial Hell Survivor / Ghost Developer>",
   "verdictTag": "<Tag vonis tajam misal: ARCHITECTURAL GIGACHAD / FORK COLLECTOR / PRODUCTION BUILDER / CODE SLEEPWALKER / SOLID FULLSTACK CRAFTSMAN>",
@@ -787,7 +884,7 @@ KEMBALIKAN HANYA JSON VALID SESUAI SKEMA BERIKUT:
     "forksGivenOrReceived": "<Penilaian tajam tentang aktivitas fork & kolaborasi>",
     "codeReviewAndDiscussions": "<Evaluasi keterlibatan di review PR dan komentar diskusi issue>",
     "communityEngagementGrade": "<A+ / A / B / C / D / F>",
-    "activitySummaryRoast": "<Roasting pedas dan tajam merangkum seluruh spektrum aktivitas developer (bukan cuma commit, tapi PR, merge, stars, issue, diskusi)>"
+    "activitySummaryRoast": "<Roasting pedas dan tajam merangkum seluruh spektrum aktivitas developer>"
   },
   "metricsAudit": {
     "repoCount": <angka total repo publik>,
@@ -802,14 +899,8 @@ KEMBALIKAN HANYA JSON VALID SESUAI SKEMA BERIKUT:
   "hrVerdict": {
     "hiringDecision": "<STRONG_HIRE / CONSIDER / INTERN_MATERIAL / AUTO_REJECT>",
     "salaryNegotiationImpact": "<Analisis realistis apakah bukti nyata di GitHub ini menaikkan leverage penawaran gaji di pasar saat ini atau justru menjadi beban negosiasi>",
-    "hrRedFlags": [
-      "<Red flag 1 spesifik berbasis fakta nyata repositori/profil>",
-      "<Red flag 2>"
-    ],
-    "hrGreenFlags": [
-      "<Green flag 1 kelebihan nyata dari repo/kemampuan teknis>",
-      "<Green flag 2>"
-    ],
+    "hrRedFlags": ["<Red flag 1 spesifik berbasis fakta nyata repositori/profil>", "<Red flag 2>"],
+    "hrGreenFlags": ["<Green flag 1 kelebihan nyata dari repo/kemampuan teknis>", "<Green flag 2>"],
     "interviewSurvivability": <angka 0-100 peluang lolos technical & architectural interview>
   },
   "historyAudit": {
@@ -891,29 +982,19 @@ KEMBALIKAN HANYA JSON VALID SESUAI SKEMA BERIKUT:
     {
       "timeframe": "Minggu 1-2 (Hygiene & Sanitasi Repo)",
       "milestoneTitle": "Pembersihan Repositori & Dokumentasi Profesional",
-      "actionItems": [
-        "<Tindakan konkret 1>",
-        "<Tindakan konkret 2>",
-        "<Tindakan konkret 3>"
-      ],
+      "actionItems": ["<Tindakan konkret 1>", "<Tindakan konkret 2>", "<Tindakan konkret 3>"],
       "expectedImpact": "<Dampak langsung pada lolos screening awal recruiter>"
     },
     {
       "timeframe": "Bulan 1 (Production Grade Flagship Project)",
       "milestoneTitle": "Membangun Proyek Unggulan Terdistribusi / Fullstack",
-      "actionItems": [
-        "<Tindakan konkret 1>",
-        "<Tindakan konkret 2>"
-      ],
+      "actionItems": ["<Tindakan konkret 1>", "<Tindakan konkret 2>"],
       "expectedImpact": "<Meningkatkan probabilitas lolos technical screen>"
     },
     {
       "timeframe": "Bulan 2-3 (Otoritas Komunitas & Open Source)",
       "milestoneTitle": "Otoritas Teknis & Rekrutmen Inbound",
-      "actionItems": [
-        "<Tindakan konkret 1>",
-        "<Tindakan konkret 2>"
-      ],
+      "actionItems": ["<Tindakan konkret 1>", "<Tindakan konkret 2>"],
       "expectedImpact": "<Daya tawar gaji maksimal dan tawaran kerja langsung dari hiring manager>"
     }
   ]
@@ -949,8 +1030,12 @@ METRIK REPOSITORI & KONTRIBUSI:
 - Total Bintang Pada Repo Fork: ${fetchedGithubData.forkedStars} stars
 - Followers: ${fetchedGithubData.followers} | Following: ${fetchedGithubData.following}
 - Repo dengan Deskripsi Lengkap: ${fetchedGithubData.reposWithDescriptionCount} dari ${fetchedGithubData.originalRepoCount} repo asli
-- Repo dengan Live Demo URL: ${fetchedGithubData.reposWithHomepageCount} repo ${fetchedGithubData.liveDemoList.length > 0 ? `[${fetchedGithubData.liveDemoList.join(", ")}]` : ""}
-- Repo dengan Lisensi Open Source: ${fetchedGithubData.reposWithLicenseCount} repo ${fetchedGithubData.licenseList.length > 0 ? `[${fetchedGithubData.licenseList.join(", ")}]` : ""}
+- Repo dengan Live Demo URL: ${fetchedGithubData.reposWithHomepageCount} repo ${
+        fetchedGithubData.liveDemoList.length > 0 ? `[${fetchedGithubData.liveDemoList.join(", ")}]` : ""
+      }
+- Repo dengan Lisensi Open Source: ${fetchedGithubData.reposWithLicenseCount} repo ${
+        fetchedGithubData.licenseList.length > 0 ? `[${fetchedGithubData.licenseList.join(", ")}]` : ""
+      }
 - Komposisi Bahasa Terbanyak: ${fetchedGithubData.topLanguages.join(", ")}
 
 METRIK HIGIENIS COMMIT & AKTIVITAS:
@@ -1026,27 +1111,34 @@ ${
       },
     });
 
-    const cleanedText = cleanJsonString(response.text || "{}");
+    const cleanedText = cleanJsonString((response as GeminiTextResponse).text || "{}");
     const parsed = JSON.parse(cleanedText);
     res.json({ success: true, data: parsed });
   } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+      });
+    }
     console.error("GitHub Roast Error:", error);
     res.status(500).json({ success: false, error: formatErrorMessage(error) });
   }
 });
 
-
 // =========================================================================
 // 4. INTERACTIVE HR CHATBOT (/api/chat-hr)
 // =========================================================================
-app.post("/api/chat-hr", async (req, res) => {
+
+app.post("/api/chat-hr", aiLimiter, async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
-    const { messages = [], cvContext, targetRole = "Software Engineer" } = req.body;
+    const { messages = [], cvContext, targetRole = "Software Engineer" } =
+      HRChatRequestSchema.parse(req.body);
     const ai = getGeminiClient();
 
     const systemPrompt = `
-Kamu adalah "Savage Head of Talent Acquisition & Executive Career Coach". 
+Kamu adalah "Savage Head of Talent Acquisition & Executive Career Coach".
 Gaya bicaramu: tajam, to-the-point, berwawasan insider HR tingkat tinggi, lucu, sarkas bila kandidat memberikan jawaban lemah, namun sangat solutif dalam membantu kandidat memperbaiki CV dan lolos wawancara kerja.
 
 Target Posisi: ${targetRole}
@@ -1075,10 +1167,16 @@ Konteks Evaluasi CV: ${cvContext ? JSON.stringify(cvContext) : "Belum ada CV yan
     res.json({
       success: true,
       data: {
-        reply: response.text || "Maaf, rekruter sedang sibuk mengeliminasi CV lain. Coba tanyakan lagi.",
+        reply: (response as GeminiTextResponse).text || "Maaf, rekruter sedang sibuk mengeliminasi CV lain. Coba tanyakan lagi.",
       },
     });
   } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+      });
+    }
     console.error("Chat error:", error);
     res.status(500).json({ success: false, error: formatErrorMessage(error) });
   }
@@ -1087,13 +1185,12 @@ Konteks Evaluasi CV: ${cvContext ? JSON.stringify(cvContext) : "Belum ada CV yan
 // =========================================================================
 // 5. BULLET POINT REWRITER (/api/rewrite-bullet)
 // =========================================================================
-app.post("/api/rewrite-bullet", async (req, res) => {
+
+app.post("/api/rewrite-bullet", aiLimiter, async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
-    const { bulletText, role = "Software Engineer", metricHint = "" } = req.body;
-    if (!bulletText) {
-      return res.status(400).json({ success: false, error: "Kalimat tidak boleh kosong." });
-    }
+    const { bulletText, role = "Software Engineer", metricHint = "" } =
+      RewriteBulletRequestSchema.parse(req.body);
 
     const ai = getGeminiClient();
 
@@ -1134,11 +1231,64 @@ KEMBALIKAN HANYA JSON DENGAN STRUKTUR BERIKUT:
       },
     });
 
-    const cleanedText = cleanJsonString(response.text || "{}");
+    const cleanedText = cleanJsonString((response as GeminiTextResponse).text || "{}");
     const parsed = JSON.parse(cleanedText);
     res.json({ success: true, data: parsed });
   } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+      });
+    }
     console.error("Rewrite error:", error);
+    res.status(500).json({ success: false, error: formatErrorMessage(error) });
+  }
+});
+
+// =========================================================================
+// 6. QUICK ROAST (/api/quick-roast)
+// =========================================================================
+
+app.post("/api/quick-roast", aiLimiter, async (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  try {
+    const { snippet, role, language = "id" } = QuickRoastRequestSchema.parse(req.body);
+
+    const ai = getGeminiClient();
+
+    const systemInstruction = `
+Kamu adalah "Savage BANGKAH Tech Recruiter" dengan pengalaman 15+ tahun.
+Tugasmu: berikan 1-2 kalimat roasting kilat, tajam, dan pedas terhadap cuplikan CV / bio berikut.
+Tugasmu: berikan output HANYA dalam format JSON:
+{
+  "punchline": "<1-2 kalimat roasting kilat>"
+}
+
+Target Posisi: ${role || "General"}
+Bahasa: ${language === "en" ? "English" : "Bahasa Indonesia"}
+Cuplikan CV / Bio: "${snippet}"
+`;
+
+    const response = await generateWithRetry(ai, {
+      contents: [{ text: `Berikan roasting kilat untuk: "${snippet}"` }],
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+      },
+    });
+
+    const cleanedText = cleanJsonString((response as GeminiTextResponse).text || "{}");
+    const parsed = JSON.parse(cleanedText);
+    res.json({ success: true, data: parsed });
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+      });
+    }
+    console.error("Quick roast error:", error);
     res.status(500).json({ success: false, error: formatErrorMessage(error) });
   }
 });

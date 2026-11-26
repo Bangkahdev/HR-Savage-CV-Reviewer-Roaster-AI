@@ -343,6 +343,9 @@ Health check endpoint untuk memverifikasi kesiapan server backend.
 {
   "status": "ok",
   "service": "HR Savage CV Reviewer & Roaster AI",
-  "timestamp": "2026-08-22T07:30:00.000Z"
+  "version": "2.0.0",
+  "hasApiKey": true,
+  "timestamp": "2026-08-22T07:30:00.000Z",
+  "env": "production"
 }
 ```

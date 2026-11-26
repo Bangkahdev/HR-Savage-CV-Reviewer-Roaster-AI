@@ -74,17 +74,25 @@ Sistem penilaian menggunakan skala **0 - 100 poin** yang terbagi dalam 5 dimensi
 ## Tech Stack & Arsitektur
 
 ### Frontend
-- **React 19** & **TypeScript**
-- **Vite 6** (Modern Fast Bundler)
-- **Tailwind CSS v4** (Desain Bento Grid Modern & Dark Mode Glassmorphism)
+- **React 18** & **TypeScript**
+- **Vite 5** (Modern Fast Bundler)
+- **Tailwind CSS** (Soft UI, Bento Grid, Dark Mode Glassmorphism)
 - **Motion (`motion/react`)** (Animasi interaktif dan transisi fluid)
 - **Lucide React** (Ikonografi komprehensif)
 - **jspdf** & **canvas-confetti** (Generator laporan PDF & efek visual selebrasi)
 
 ### Backend
 - **Express.js** (Server API & Middleware Handler)
-- **`@google/genai` (Google Gen AI SDK)** dengan model **Gemini 2.5 Flash / Gemini 3.7 Flash**
+- **`@google/genai` (Google Gen AI SDK)** dengan model **Gemini 2.5 Flash**
+- **CORS** + **express-rate-limit** (Keamanan & rate limiting)
+- **Zod** (Validasi input request)
 - **esbuild** (Single-bundle CJS compilation untuk *production runtime*)
+
+### Keamanan
+- `GEMINI_API_KEY` hanya berjalan *server-side*, tidak pernah diekspos ke browser.
+- CORS terbatas pada origin yang diizinkan (`ALLOWED_ORIGINS`).
+- Rate limiting global & per-endpoint AI untuk mencegah penyalahgunaan.
+- Semua request body divalidasi dengan Zod sebelum diproses.
 
 ---
 
@@ -142,6 +150,23 @@ npm run start
 | `APP_URL` | Opsional | URL dasar tempat aplikasi di-host (default: `http://localhost:3000`). |
 
  **Catatan Keamanan:** Kunci API `GEMINI_API_KEY` hanya berjalan pada *server-side* (`server.ts`) dan tidak pernah diekspos ke peramban client.
+
+---
+
+## Deploy ke Vercel
+
+Aplikasi ini siap di-deploy ke Vercel sebagai serverless function.
+
+### Langkah Deploy
+1. Hubungkan repository GitHub ke Vercel.
+2. Vercel akan otomatis mendeteksi `vercel.json` dan menggunakan build command `npm run build`.
+3. Tambahkan Environment Variables di Vercel Dashboard > Settings > Environment Variables:
+   - `GEMINI_API_KEY` — API Key Google Gemini (wajib)
+   - `APP_URL` — URL produksi Vercel, misal `https://your-app.vercel.app`
+   - `ALLOWED_ORIGINS` — Daftar origin yang diizinkan untuk CORS (misal `https://your-app.vercel.app`)
+4. Deploy. Route `/api/*` akan diarahkan ke `api/index.ts` (serverless), sementara aset statis disajikan dari `dist/`.
+
+**Catatan:** `server.ts` melewati `app.listen()` ketika `process.env.VERCEL === "1"`, sehingga tidak mencoba menjalankan server berkelanjutan di lingkungan serverless Vercel.
 
 ---
 
