@@ -89,7 +89,22 @@ Untuk mengatasi masalah ketidakakuratan atau tuduhan fiktif saat roasting, siste
 
 1. **Server-Side API Key Encapsulation:**
    Kunci API `GEMINI_API_KEY` dikelola eksklusif pada runtime backend container. Klien browser tidak pernah menerima atau mengekspos token rahasia.
-2. **Ephemeral Document Processing:**
+
+2. **CORS Origin Whitelist:**
+   Middleware `cors()` terbatas pada origin yang terdaftar di `ALLOWED_ORIGINS` (default: localhost). Tidak ada wildcard origin di produksi.
+
+3. **Rate Limiting:**
+   - Global limiter: 100 request per 15 menit per IP pada semua `/api/*`.
+   - AI limiter: 20 request per 15 menit per IP pada endpoint AI (`review-cv`, `digital-footprint`, `roast-github`, `chat-hr`, `rewrite-bullet`, `quick-roast`).
+   - Header standar `RateLimit-*` dikirim ke klien.
+
+4. **Input Validation:**
+   Semua request body divalidasi dengan **Zod** sebelum mencapai bisnis logic. Invalid input mengembalikan 400 dengan pesan error yang jelas.
+
+5. **Payload Size Limit:**
+   Request JSON dan URL-encoded dibatasi maksimal 25MB.
+
+6. **Ephemeral Document Processing:**
    File CV (PDF/Gambar) yang diunggah dikonversi menjadi buffer base64 dalam memori, diproses ke API Gemini secara *stateless*, dan langsung dibuang dari memori tanpa disimpan di disk penyimpanan publik.
 
 ---
