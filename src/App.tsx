@@ -78,9 +78,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-red-500 selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans relative overflow-x-hidden selection:bg-coral-200 selection:text-slate-900">
       {/* Top Ambient Glow Background */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-red-600/5 blur-[120px] pointer-events-none -z-10 rounded-full"></div>
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-80 bg-coral-100/60 blur-[100px] pointer-events-none -z-10 rounded-full"></div>
 
       {/* Navbar with 3 Mode Switchers */}
       <Header
@@ -97,14 +97,14 @@ export default function App() {
       <main className="flex-1 pb-12">
         {errorMessage && (
           <div className="max-w-4xl mx-auto mt-6 px-4">
-            <div className="p-4 rounded-2xl bg-red-950/80 border border-red-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-red-300 text-xs sm:text-sm shadow-2xl backdrop-blur-md">
+            <div className="p-4 rounded-2xl bg-coral-50 border border-coral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-coral-800 text-xs sm:text-sm shadow-xl backdrop-blur-md">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
+                <AlertCircle className="w-5 h-5 flex-shrink-0 text-coral-600 mt-0.5" />
                 <div>
-                  <strong className="block font-bold text-red-200 uppercase tracking-wide text-xs mb-1">
+                  <strong className="block font-bold text-coral-900 uppercase tracking-wide text-xs mb-1">
                     Evaluasi Terkendala (Trafik Server AI):
                   </strong>
-                  <span className="text-zinc-300 leading-relaxed text-xs">{errorMessage}</span>
+                  <span className="text-slate-600 leading-relaxed text-xs">{errorMessage}</span>
                 </div>
               </div>
 
@@ -113,7 +113,7 @@ export default function App() {
                   type="button"
                   onClick={handleRetry}
                   disabled={isLoading}
-                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 self-start sm:self-auto flex-shrink-0 cursor-pointer shadow-md disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl bg-coral-600 hover:bg-coral-700 text-white font-bold text-xs uppercase tracking-wider transition flex items-center gap-2 self-start sm:self-auto flex-shrink-0 cursor-pointer shadow-md disabled:opacity-50"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Coba Lagi Sekarang</span>
@@ -177,15 +177,15 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer className="w-full border-t border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md py-6 text-center text-xs text-zinc-500">
+      <footer className="w-full border-t border-slate-200/80 bg-white/80 backdrop-blur-md py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-red-500" />
-            <span className="font-semibold text-zinc-400">
+            <Flame className="w-4 h-4 text-coral-500" />
+            <span className="font-semibold text-slate-600">
               HR Savage CV Reviewer &amp; Developer Roaster
             </span>
           </div>
-          <p className="text-zinc-500 text-[11px]">CV Roast • Jejak Digital Checker • GitHub Roaster • Powered by Gemini 3.7 Flash</p>
+          <p className="text-slate-500 text-[11px]">CV Roast • Jejak Digital Checker • GitHub Roaster • Powered by Gemini 2.5 Flash</p>
         </div>
       </footer>
     </div>

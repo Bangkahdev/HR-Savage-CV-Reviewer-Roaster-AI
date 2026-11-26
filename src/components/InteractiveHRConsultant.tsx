@@ -101,118 +101,59 @@ export const InteractiveHRConsultant: React.FC<InteractiveHRConsultantProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl h-[600px] max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="p-4 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl h-[600px] max-h-[90vh] flex flex-col shadow-2xl overflow-hidden page-fade">
+        <div className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-red-500">
+            <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-coral-500 shadow-sm">
               <Flame className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xs sm:text-sm font-black text-zinc-100 uppercase tracking-wide flex items-center gap-1.5">
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
                 Konsultasi & Tanya HR Savage
               </h3>
-              <p className="text-[11px] text-zinc-400 font-mono">TARGET ROLE: {targetRole}</p>
+              <p className="text-[11px] text-slate-400 font-mono">TARGET ROLE: {targetRole}</p>
             </div>
           </div>
-
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <button onClick={onClose} className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 border border-slate-200 transition soft-btn"><X className="w-4 h-4" /></button>
         </div>
 
-        {/* Chat Messages */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-4 text-xs sm:text-sm">
+        <div className="flex-1 p-5 overflow-y-auto space-y-4 text-xs sm:text-sm">
           {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-            >
+            <div key={msg.id} className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
               {msg.sender === "hr" && (
-                <div className="w-7 h-7 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-red-500 flex-shrink-0 mt-1">
-                  <Flame className="w-4 h-4" />
-                </div>
+                <div className="w-7 h-7 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-coral-500 flex-shrink-0 mt-1 shadow-sm"><Flame className="w-4 h-4" /></div>
               )}
-
-              <div
-                className={`p-3.5 rounded-2xl max-w-[85%] leading-relaxed ${
-                  msg.sender === "user"
-                    ? "bg-red-600 text-white rounded-tr-none shadow-md"
-                    : "bg-zinc-950 text-zinc-200 border border-zinc-800 rounded-tl-none"
-                }`}
-              >
-                <div className="prose prose-invert prose-xs max-w-none text-xs sm:text-sm">
-                  <ReactMarkdown>{msg.text}</ReactMarkdown>
-                </div>
-                <div
-                  className={`text-[10px] mt-1 text-right font-mono ${
-                    msg.sender === "user" ? "text-red-200" : "text-zinc-500"
-                  }`}
-                >
-                  {msg.timestamp}
-                </div>
+              <div className={`p-3.5 rounded-3xl max-w-[85%] leading-relaxed ${msg.sender === "user" ? "bg-coral-600 text-white rounded-tr-none shadow-sm" : "bg-slate-50 text-slate-700 border border-slate-200 rounded-tl-none soft-shadow"}`}>
+                <div className="prose prose-invert prose-xs max-w-none text-xs sm:text-sm"><ReactMarkdown>{msg.text}</ReactMarkdown></div>
+                <div className={`text-[10px] mt-1 text-right font-mono ${msg.sender === "user" ? "text-coral-200" : "text-slate-400"}`}>{msg.timestamp}</div>
               </div>
-
               {msg.sender === "user" && (
-                <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 flex-shrink-0 mt-1">
-                  <User className="w-4 h-4" />
-                </div>
+                <div className="w-7 h-7 rounded-xl bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 flex-shrink-0 mt-1 shadow-sm"><User className="w-4 h-4" /></div>
               )}
             </div>
           ))}
-
           {isSending && (
             <div className="flex gap-3 justify-start items-center">
-              <div className="w-7 h-7 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-red-500 flex-shrink-0">
-                <Flame className="w-4 h-4 animate-pulse" />
-              </div>
-              <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-400 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span>HR sedang meracik jawaban...</span>
-              </div>
+              <div className="w-7 h-7 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-coral-500 flex-shrink-0 shadow-sm"><Flame className="w-4 h-4 animate-pulse" /></div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500 flex items-center gap-2 shadow-sm"><div className="w-2 h-2 rounded-full bg-coral-500 animate-pulse" /><span>HR sedang meracik jawaban...</span></div>
             </div>
           )}
-
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Questions Pills */}
-        <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-800 flex overflow-x-auto gap-1.5 scrollbar-none">
+        <div className="px-5 py-3 bg-white border-t border-slate-200 flex overflow-x-auto gap-1.5 scrollbar-none">
           {QUICK_QUESTIONS.map((q, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handleSendMessage(q)}
-              className="text-[11px] px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white whitespace-nowrap border border-zinc-800 transition flex items-center gap-1"
-            >
-              <Sparkles className="w-3 h-3 text-red-400" /> {q}
-            </button>
+            <button key={idx} type="button" onClick={() => handleSendMessage(q)} className="text-[11px] px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 whitespace-nowrap border border-slate-200 transition flex items-center gap-1 soft-btn"><Sparkles className="w-3 h-3 text-coral-400" /> {q}</button>
           ))}
         </div>
 
-        {/* Input Bar */}
-        <div className="p-3 bg-zinc-950 border-t border-zinc-800 flex items-center gap-2">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="Tanyakan sesuatu atau minta HR rombak bagian tertentu..."
-            className="flex-1 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-100 text-xs sm:text-sm focus:outline-none focus:border-red-500"
-          />
-          <button
-            onClick={() => handleSendMessage()}
-            disabled={!inputText.trim() || isSending}
-            className="p-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+        <div className="p-4 bg-white border-t border-slate-200 flex items-center gap-2">
+          <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} placeholder="Tanyakan sesuatu atau minta HR rombak bagian tertentu..." className="flex-1 px-4 py-3 rounded-3xl bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm focus:outline-none focus:border-coral-400 focus-ring-soft" />
+          <button onClick={() => handleSendMessage()} disabled={!inputText.trim() || isSending} className="p-2.5 rounded-3xl bg-coral-600 hover:bg-coral-700 text-white transition disabled:opacity-60 disabled:cursor-not-allowed shadow-md cursor-pointer soft-btn"><Send className="w-4 h-4" /></button>
         </div>
       </div>
     </div>
   );
 };
+
