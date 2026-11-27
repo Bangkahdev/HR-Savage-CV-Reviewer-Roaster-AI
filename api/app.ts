@@ -364,7 +364,7 @@ KEMBALIKAN HANYA JSON VALID DENGAN STRUKTUR BERIKUT:
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
-        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+        error: "Validasi input gagal: " + error.issues.map((e) => e.message).join(", "),
       });
     }
     console.error("CV Review Error:", error);
@@ -470,7 +470,7 @@ Keluarkan HANYA JSON valid.
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
-        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+        error: "Validasi input gagal: " + error.issues.map((e) => e.message).join(", "),
       });
     }
     console.error("Digital Footprint Error:", error);
@@ -1121,7 +1121,7 @@ ${
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
-        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+        error: "Validasi input gagal: " + error.issues.map((e) => e.message).join(", "),
       });
     }
     console.error("GitHub Roast Error:", error);
@@ -1177,7 +1177,7 @@ Konteks Evaluasi CV: ${cvContext ? JSON.stringify(cvContext) : "Belum ada CV yan
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
-        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+        error: "Validasi input gagal: " + error.issues.map((e) => e.message).join(", "),
       });
     }
     console.error("Chat error:", error);
@@ -1241,7 +1241,7 @@ KEMBALIKAN HANYA JSON DENGAN STRUKTUR BERIKUT:
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
-        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+        error: "Validasi input gagal: " + error.issues.map((e) => e.message).join(", "),
       });
     }
     console.error("Rewrite error:", error);
@@ -1288,7 +1288,7 @@ Cuplikan CV / Bio: "${snippet}"
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
-        error: "Validasi input gagal: " + error.errors.map((e) => e.message).join(", "),
+        error: "Validasi input gagal: " + error.issues.map((e) => e.message).join(", "),
       });
     }
     console.error("Quick roast error:", error);
@@ -1297,3 +1297,4 @@ Cuplikan CV / Bio: "${snippet}"
 });
 
 export default app;
+
