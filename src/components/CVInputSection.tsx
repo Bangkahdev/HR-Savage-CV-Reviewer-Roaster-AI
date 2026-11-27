@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import {
   UploadCloud,
-  FileText,
   Trash2,
   Flame,
   Sparkles,
@@ -46,7 +45,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
 
   const [targetRole, setTargetRole] = useState("Software Engineer");
   const [targetLevel, setTargetLevel] = useState<TargetLevel>("mid");
-  const [industry, setIndustry] = useState("Tech / Startup");
+  const [industry] = useState("Tech / Startup");
   const [jobDescription, setJobDescription] = useState("");
   const [showJdInput, setShowJdInput] = useState(false);
   const [strictnessMode, setStrictnessMode] = useState<StrictnessMode>("savage_brutal");
@@ -79,7 +78,7 @@ export const CVInputSection: React.FC<CVInputSectionProps> = ({
         const base64Data = result.split(",")[1];
         setFileData({
           mimeType: file.type || "application/pdf",
-          data: base64Data,
+          data: base64Data ?? "",
           fileName: file.name,
           sizeKb: Math.round(file.size / 1024),
         });

@@ -99,7 +99,7 @@ export const ReviewDashboard: React.FC<ReviewDashboardProps> = ({
             {result.overallScore}
             <span className="text-xl text-slate-400 font-bold">/100</span>
           </div>
-          <div className="mt-5 px-4 py-1.5 text-xs font-black rounded-full border uppercase tracking-wider z-10 relative shadow-sm ${
+          <div className={`mt-5 px-4 py-1.5 text-xs font-black rounded-full border uppercase tracking-wider z-10 relative shadow-sm ${
             result.overallScore < 50
               ? "bg-coral-50 text-coral-700 border-coral-200/60"
               : result.overallScore < 75

@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { z, ZodError } from "zod";
 
 dotenv.config();
@@ -16,11 +16,14 @@ const app = express();
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-// CORS — restrict in production via env
+// CORS — restrict via ALLOWED_ORIGINS when provided; otherwise reflect the
+// request origin so same-origin and Vercel preview deployments work out of the box.
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
+  : null;
+
 const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
-    : ["http://localhost:3000", "https://localhost:3000"],
+  origin: allowedOrigins ?? true,
   credentials: true,
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -871,7 +874,7 @@ KEMBALIKAN HANYA JSON VALID SESUAI SKEMA BERIKUT:
   "detectedDeveloperRole": "<Peran/Spesialisasi yang kamu deteksi secara akurat dari komposisi kode>",
   "targetRoleEvaluated": "${evaluatedTargetRole}",
   "realNameOrBio": "<Nama asli atau bio nyata dari GitHub>",
-  "avatarUrl": "${fetchedGithubData?.avatar_url || \`https://github.com/\${username}.png\`}",
+  "avatarUrl": "${fetchedGithubData?.avatar_url || `https://github.com/${username}.png`}",
   "devScore": <angka 0-100 terkalibrasi secara objektif>,
   "devTier": "<Production Hardened Chad / Senior Architect / Solid Mid-Level / Junior CRUD Specialist / Tutorial Hell Survivor / Ghost Developer>",
   "verdictTag": "<Tag vonis tajam misal: ARCHITECTURAL GIGACHAD / FORK COLLECTOR / PRODUCTION BUILDER / CODE SLEEPWALKER / SOLID FULLSTACK CRAFTSMAN>",

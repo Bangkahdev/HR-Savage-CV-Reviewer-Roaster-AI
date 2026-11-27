@@ -8,9 +8,7 @@ import {
   Briefcase,
   MessageSquare,
   Code2,
-  Flame,
   Sparkles,
-  ArrowRight,
   ShieldCheck,
   RotateCcw,
   Check,
@@ -29,7 +27,6 @@ interface DigitalFootprintSectionProps {
 export const DigitalFootprintSection: React.FC<DigitalFootprintSectionProps> = ({
   initialCvText = "",
   initialTargetRole = "Software Engineer",
-  onRoastAnother,
 }) => {
   const [candidateName, setCandidateName] = useState("");
   const [targetRole, setTargetRole] = useState(initialTargetRole);

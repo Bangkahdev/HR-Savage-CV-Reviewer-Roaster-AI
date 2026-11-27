@@ -4,20 +4,15 @@ import {
   Code2,
   GitBranch,
   Terminal,
-  Cpu,
   AlertTriangle,
   Sparkles,
   RotateCcw,
   Check,
   Copy,
-  ExternalLink,
-  BookOpen,
-  Layers,
   Award,
   History,
   Briefcase,
   TrendingUp,
-  UserCheck,
   ShieldAlert,
   ShieldCheck,
   Zap,
@@ -363,7 +358,7 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-2xl">{ach.badge || "🏆"}</span>
-                          <span className={`text-[9px] font-black px-2 py=0.5 rounded-full uppercase ${ach.status === "UNLOCKED" ? "bg-emerald-100 text-emerald-400" : ach.status === "FAILED" ? "bg-coral-100 text-coral-400" : "bg-slate-200 text-slate-400"}`}>{ach.status}</span>
+                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${ach.status === "UNLOCKED" ? "bg-emerald-100 text-emerald-400" : ach.status === "FAILED" ? "bg-coral-100 text-coral-400" : "bg-slate-200 text-slate-400"}`}>{ach.status}</span>
                         </div>
                         <h4 className="text-xs font-bold text-slate-900 mb-1">{ach.title}</h4>
                         <p className="text-[11px] text-slate-500 mb-2">{ach.description}</p>
@@ -387,7 +382,7 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200/80">
                   <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Tutorial Hell</h3>
-                  <span className={`text-[9px] font-black uppercase px-2.5 py=0.5 rounded-full ${result.roastCategories.tutorialHellDiagnosis.status === "severe" ? "bg-coral-600 text-white" : result.roastCategories.tutorialHellDiagnosis.status === "warning" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.tutorialHellDiagnosis.status}</span>
+                  <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${result.roastCategories.tutorialHellDiagnosis.status === "severe" ? "bg-coral-600 text-white" : result.roastCategories.tutorialHellDiagnosis.status === "warning" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.tutorialHellDiagnosis.status}</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">{result.roastCategories.tutorialHellDiagnosis.explanation}</p>
               </div>
@@ -396,7 +391,7 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200/80">
                   <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Code Smells</h3>
-                  <span className={`text-[9px] font-black uppercase px-2.5 py=0.5 rounded-full ${result.roastCategories.codeSmellAndQuality.status === "severe" ? "bg-coral-600 text-white" : result.roastCategories.codeSmellAndQuality.status === "warning" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.codeSmellAndQuality.status}</span>
+                  <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${result.roastCategories.codeSmellAndQuality.status === "severe" ? "bg-coral-600 text-white" : result.roastCategories.codeSmellAndQuality.status === "warning" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.codeSmellAndQuality.status}</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">{result.roastCategories.codeSmellAndQuality.explanation}</p>
               </div>
@@ -405,7 +400,7 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200/80">
                   <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Commit Habits</h3>
-                  <span className={`text-[9px] font-black uppercase px-2.5 py=0.5 rounded-full ${result.roastCategories.commitHabitsAndMessages.status === "severe" ? "bg-coral-600 text-white" : result.roastCategories.commitHabitsAndMessages.status === "warning" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.commitHabitsAndMessages.status}</span>
+                  <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${result.roastCategories.commitHabitsAndMessages.status === "severe" ? "bg-coral-600 text-white" : result.roastCategories.commitHabitsAndMessages.status === "warning" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.commitHabitsAndMessages.status}</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">{result.roastCategories.commitHabitsAndMessages.explanation}</p>
               </div>
@@ -414,7 +409,7 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200/80">
                   <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Kesesuaian Stack</h3>
-                  <span className={`text-[9px] font-black uppercase px-2.5 py=0.5 rounded-full ${result.roastCategories.techStackVsCvAlignment.status === "fake" ? "bg-coral-600 text-white" : result.roastCategories.techStackVsCvAlignment.status === "questionable" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.techStackVsCvAlignment.status}</span>
+                  <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${result.roastCategories.techStackVsCvAlignment.status === "fake" ? "bg-coral-600 text-white" : result.roastCategories.techStackVsCvAlignment.status === "questionable" ? "bg-amber-600 text-white" : "bg-emerald-600 text-white"}`}>{result.roastCategories.techStackVsCvAlignment.status}</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">{result.roastCategories.techStackVsCvAlignment.explanation}</p>
               </div>
@@ -430,9 +425,9 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <div className="font-mono text-sm font-bold text-coral-600 flex items-center gap-1.5"><GitBranch className="w-3.5 h-3.5" /> {repo.repoName}</div>
-                      <span className="text-[10px] font-bold px-2.5 py=0.5 rounded-full bg-slate-200 text-slate-600">{repo.verdict}</span>
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-600">{repo.verdict}</span>
                     </div>
-                    <div className="flex flex-wrap gap-1.5 mb-3">{repo.techStack.map((tech, tIdx) => (<span key={tIdx} className="px-2 py=0.5 rounded-xl bg-slate-200 text-slate-500 text-[10px] font-mono border border-slate-300">{tech}</span>))}</div>
+                    <div className="flex flex-wrap gap-1.5 mb-3">{repo.techStack.map((tech, tIdx) => (<span key={tIdx} className="px-2 py-0.5 rounded-xl bg-slate-200 text-slate-500 text-[10px] font-mono border border-slate-300">{tech}</span>))}</div>
                     <p className="text-xs text-slate-600 italic mb-2">"{repo.roast}"</p>
                   </div>
                   <div className="p-3.5 rounded-3xl bg-slate-200 border border-slate-300 text-xs text-emerald-600 shadow-inner"><strong className="text-emerald-700 block text-[10px] uppercase font-bold mb-0.5">Solusi Perbaikan:</strong>{repo.howToFix}</div>
@@ -526,4 +521,5 @@ export const GitHubRoasterSection: React.FC<GitHubRoasterSectionProps> = ({
     </div>
   );
 };
+
 

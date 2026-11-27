@@ -21,7 +21,7 @@ export const LoadingRoastAnimation: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-16 px=4 flex flex-col items-center justify-center text-center">
+    <div className="w-full max-w-2xl mx-auto py-16 px-4 flex flex-col items-center justify-center text-center">
       <div className="relative mb-6">
         <div className="w-20 h-20 rounded-3xl bg-white border border-slate-200 flex items-center justify-center shadow-xl text-coral-500 soft-shadow"><Flame className="w-10 h-10 animate-pulse" /></div>
         <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-300 shadow-sm"><Brain className="w-4 h-4 animate-spin" /></div>
@@ -35,7 +35,7 @@ export const LoadingRoastAnimation: React.FC = () => {
       <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mb-2">Brutal HR Audit In Progress...</h3>
       <p className="text-xs sm:text-sm text-slate-500 max-w-md mb-8">Strict criteria calibrated against global top-tier hiring standards.</p>
 
-      <div className="w-full bg-white border border-slate-200 rounded-3xl p=6 text-left soft-shadow-lg page-fade">
+      <div className="w-full bg-white border border-slate-200 rounded-3xl p-6 text-left soft-shadow-lg page-fade">
         <div className="space-y-3.5">
           {LOADING_STEPS.map((step, idx) => {
             const isCompleted = idx < currentStepIndex;
@@ -58,4 +58,5 @@ export const LoadingRoastAnimation: React.FC = () => {
     </div>
   );
 };
+
 
